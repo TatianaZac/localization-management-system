@@ -1,0 +1,86 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum TranslationStatus {
+  NEW
+  TRANSLATED
+  REVIEWED
+  OUTDATED
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Project {
+  id               Int              @id @default(autoincrement())
+  name             String
+  description      String?
+  sourceLocaleCode String           @default("en")
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+  locales          Locale[]
+  translationKeys  TranslationKey[]
+}
+
+model Locale {
+  id           Int           @id @default(autoincrement())
+  projectId    Int
+  code         String
+  name         String
+  isSource     Boolean       @default(false)
+  createdAt    DateTime      @default(now())
+  project      Project       @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  translations Translation[]
+
+  @@unique([projectId, code])
+}
+
+model TranslationKey {
+  id           Int           @id @default(autoincrement())
+  projectId    Int
+  key          String
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  project      Project       @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  sourceTexts  SourceText[]
+  translations Translation[]
+
+  @@unique([projectId, key])
+}
+
+model SourceText {
+  id               Int            @id @default(autoincrement())
+  translationKeyId Int
+  value            String
+  version          Int
+  isCurrent        Boolean        @default(true)
+  createdAt        DateTime       @default(now())
+  translationKey   TranslationKey @relation(fields: [translationKeyId], references: [id], onDelete: Cascade)
+
+  @@unique([translationKeyId, version])
+}
+
+model Translation {
+  id               Int               @id @default(autoincrement())
+  translationKeyId Int
+  localeId         Int
+  value            String?
+  status           TranslationStatus @default(NEW)
+  sourceVersion    Int?
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  translationKey   TranslationKey    @relation(fields: [translationKeyId], references: [id], onDelete: Cascade)
+  locale           Locale            @relation(fields: [localeId], references: [id], onDelete: Cascade)
+
+  @@unique([translationKeyId, localeId])
+}

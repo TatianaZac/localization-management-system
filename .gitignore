@@ -1,0 +1,16 @@
+# Dependencies and local secrets
+**/node_modules/
+**/.env
+
+# IDE and AI-tool workspace files
+.idea/
+**/.agents/
+**/.claude/
+**/.windsurf/
+
+# Generated files
+server/src/generated/prisma/
+uploads/
+
+# Operating-system files
+Thumbs.db
