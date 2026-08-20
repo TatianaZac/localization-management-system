@@ -1,0 +1,112 @@
+.table-card {
+  overflow: hidden;
+}
+
+.table-heading {
+  padding: 22px;
+  border-bottom: 1px solid #edf2f7;
+}
+
+.table-heading h2 {
+  margin-bottom: 0;
+}
+
+.table-heading > span {
+  color: #627d98;
+  font-size: 13px;
+}
+
+.table-scroll {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+th,
+td {
+  padding: 15px 22px;
+  vertical-align: top;
+  border-bottom: 1px solid #edf2f7;
+}
+
+th {
+  color: #627d98;
+  font-size: 11px;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+td {
+  color: #334e68;
+  font-size: 14px;
+}
+
+td:first-child {
+  width: 23%;
+}
+
+td:nth-child(2) {
+  width: 31%;
+}
+
+td small {
+  display: block;
+  margin-top: 6px;
+  color: #829ab1;
+  font-size: 11px;
+}
+
+.translation-row {
+  justify-content: flex-start;
+  min-width: 230px;
+  gap: 9px;
+}
+
+.translation-row + .translation-row {
+  margin-top: 9px;
+}
+
+.translation-row .status {
+  margin-left: auto;
+}
+
+.status.new {
+  background: #edf2f7;
+  color: #52616b;
+}
+
+.status.translated {
+  background: #e1effe;
+  color: #175da8;
+}
+
+.status.reviewed {
+  background: #e6fffa;
+  color: #1d6f65;
+}
+
+.status.outdated {
+  background: #fff5eb;
+  color: #b45309;
+}
+
+.no-translations,
+.empty-table {
+  color: #627d98;
+}
+
+.empty-table {
+  margin: 0;
+  padding: 42px 22px;
+}
+
+@media (max-width: 760px) {
+  th,
+  td {
+    padding: 13px;
+  }
+}
