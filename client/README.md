@@ -1,32 +1,37 @@
-# React + TypeScript + Vite
+# LocaleFlow
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+Дипломний проєкт: система керування локалізаційними проєктами.
 
-Currently, two official plugins are available:
+## Технології
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- клієнт: React + JavaScript
+- запуск клієнта: Vite
+- сервер: Node.js + Express
+- база даних: PostgreSQL + Prisma
 
-## React Compiler
+## Запуск
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Відкрий два термінали.
 
-## Expanding the Oxlint configuration
+### Сервер
 
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
-
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+```powershell
+cd D:\localization-management-system\server
+npm run dev
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+### Клієнт
+
+```powershell
+cd D:\localization-management-system\client
+npm run dev
+```
+
+Після цього відкрий адресу, яку покаже клієнт, зазвичай http://localhost:5173.
+
+## Швидка перевірка
+
+1. Створи проєкт.
+2. Додай українську мову: `uk` — `Українська`.
+3. Імпортуй файл `examples/en.json`.
+4. У таблиці мають з’явитися 13 ключів локалізації.

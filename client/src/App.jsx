@@ -1,60 +1,9 @@
-import { useEffect, useState, type ChangeEvent, type FormEvent } from 'react'
+import { useEffect, useState } from 'react'
 import './App.css'
-
-type Locale = {
-  id: number
-  code: string
-  name: string
-  isSource: boolean
-}
-
-type Translation = {
-  id: number
-  value: string | null
-  status: 'NEW' | 'TRANSLATED' | 'REVIEWED' | 'OUTDATED'
-  sourceVersion: number | null
-  locale: Pick<Locale, 'code' | 'name'>
-}
-
-type SourceText = {
-  id: number
-  value: string
-  version: number
-}
-
-type TranslationKey = {
-  id: number
-  key: string
-  sourceTexts: SourceText[]
-  translations: Translation[]
-}
-
-type ProjectSummary = {
-  id: number
-  name: string
-  description: string | null
-  sourceLocaleCode: string
-  createdAt: string
-  updatedAt: string
-  localeCount: number
-  keyCount: number
-}
-
-type Project = Omit<ProjectSummary, 'localeCount' | 'keyCount'> & {
-  locales: Locale[]
-  translationKeys: TranslationKey[]
-}
-
-type ImportSummary = {
-  total: number
-  created: number
-  updated: number
-  unchanged: number
-}
 
 const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:5000/api'
 
-async function request<T>(path: string, options?: RequestInit): Promise<T> {
+async function request(path, options = {}) {
   const response = await fetch(API_URL + path, {
     ...options,
     headers: {
@@ -69,10 +18,10 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
     throw new Error(body?.error ?? 'The request could not be completed')
   }
 
-  return body as T
+  return body
 }
 
-function statusLabel(status: Translation['status']) {
+function statusLabel(status) {
   const labels = {
     NEW: 'Новий',
     TRANSLATED: 'Перекладено',
@@ -84,8 +33,8 @@ function statusLabel(status: Translation['status']) {
 }
 
 function App() {
-  const [projects, setProjects] = useState<ProjectSummary[]>([])
-  const [selectedProject, setSelectedProject] = useState<Project | null>(null)
+  const [projects, setProjects] = useState([])
+  const [selectedProject, setSelectedProject] = useState(null)
   const [newProjectName, setNewProjectName] = useState('')
   const [newProjectDescription, setNewProjectDescription] = useState('')
   const [newLocaleCode, setNewLocaleCode] = useState('uk')
@@ -95,20 +44,20 @@ function App() {
   const [isSaving, setIsSaving] = useState(false)
 
   async function loadProjects() {
-    const data = await request<ProjectSummary[]>('/projects')
+    const data = await request('/projects')
     setProjects(data)
   }
 
-  async function loadProject(projectId: number) {
-    const data = await request<Project>('/projects/' + projectId)
+  async function loadProject(projectId) {
+    const data = await request('/projects/' + projectId)
     setSelectedProject(data)
   }
 
   useEffect(() => {
-    void loadProjects().catch((requestError: Error) => setError(requestError.message))
+    void loadProjects().catch((requestError) => setError(requestError.message))
   }, [])
 
-  async function selectProject(projectId: number) {
+  async function selectProject(projectId) {
     setError('')
     setNotice('')
 
@@ -119,14 +68,14 @@ function App() {
     }
   }
 
-  async function createProject(event: FormEvent<HTMLFormElement>) {
+  async function createProject(event) {
     event.preventDefault()
     setError('')
     setNotice('')
     setIsSaving(true)
 
     try {
-      const project = await request<{ id: number }>('/projects', {
+      const project = await request('/projects', {
         method: 'POST',
         body: JSON.stringify({
           name: newProjectName,
@@ -150,7 +99,7 @@ function App() {
     }
   }
 
-  async function addLocale(event: FormEvent<HTMLFormElement>) {
+  async function addLocale(event) {
     event.preventDefault()
 
     if (!selectedProject) {
@@ -162,7 +111,7 @@ function App() {
     setIsSaving(true)
 
     try {
-      await request<Locale>('/projects/' + selectedProject.id + '/locales', {
+      await request('/projects/' + selectedProject.id + '/locales', {
         method: 'POST',
         body: JSON.stringify({
           code: newLocaleCode,
@@ -180,7 +129,7 @@ function App() {
     }
   }
 
-  async function importFile(event: ChangeEvent<HTMLInputElement>) {
+  async function importFile(event) {
     const file = event.target.files?.[0]
 
     if (!file || !selectedProject) {
@@ -193,7 +142,7 @@ function App() {
 
     try {
       const content = JSON.parse(await file.text())
-      const summary = await request<ImportSummary>('/projects/' + selectedProject.id + '/import', {
+      const summary = await request('/projects/' + selectedProject.id + '/import', {
         method: 'POST',
         body: JSON.stringify({ content }),
       })
