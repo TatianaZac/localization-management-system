@@ -1,0 +1,25 @@
+{
+  "catalog": {
+    "title": "Book catalog",
+    "search": {
+      "placeholder": "Search by title or author",
+      "button": "Search",
+      "noResults": "No books found"
+    },
+    "filters": {
+      "genre": "Genre",
+      "language": "Language",
+      "reset": "Reset filters"
+    },
+    "book": {
+      "author": "Author",
+      "price": "Price",
+      "details": "View details",
+      "addToCart": "Add to cart"
+    },
+    "pagination": {
+      "previous": "Previous page",
+      "next": "Next page"
+    }
+  }
+}

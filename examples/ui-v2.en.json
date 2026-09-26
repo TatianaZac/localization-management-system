@@ -1,0 +1,25 @@
+{
+  "auth": {
+    "login": "Sign in",
+    "email": "Email address",
+    "password": "Password",
+    "forgotPassword": "Forgot your password?"
+  },
+  "profile": {
+    "title": "User profile",
+    "account": "Account settings",
+    "save": "Save profile changes"
+  },
+  "product": {
+    "title": "Product",
+    "price": "Price",
+    "addToCart": "Add to cart",
+    "inStock": "Available now"
+  },
+  "checkout": {
+    "title": "Checkout",
+    "confirmOrder": "Place order",
+    "payment": "Payment",
+    "delivery": "Delivery address"
+  }
+}

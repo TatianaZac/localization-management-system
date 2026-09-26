@@ -1,0 +1,53 @@
+/* Таблиця словника та компактні підказки використовують кольори основного редактора. */
+.glossary-toolbar { display: flex; gap: 16px; margin: 20px 0; flex-wrap: wrap; }
+.glossary-toolbar label { flex: 1; min-width: 180px; }
+.glossary-page label { display: grid; gap: 6px; color: #64748b; font-size: 12px; }
+.glossary-page input, .glossary-page select, .glossary-page textarea { padding: 10px; border: 1px solid #d8dee8; border-radius: 6px; background: white; }
+.glossary-form { display: grid; gap: 14px; padding: 20px; margin-bottom: 20px; background: white; border: 1px solid #dfe4ec; border-radius: 8px; }
+.glossary-form h2 { margin: 0; font-size: 17px; }
+.glossary-buttons { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.glossary-buttons button { border: 1px solid #d8dee8; border-radius: 5px; padding: 7px 9px; cursor: pointer; }
+.glossary-buttons button:disabled { opacity: .5; cursor: default; }
+.glossary-list { background: white; border: 1px solid #dfe4ec; border-radius: 8px; overflow-x: auto; }
+.glossary-list > p { padding: 20px; color: #64748b; }
+.glossary-list table { width: 100%; border-collapse: collapse; text-align: left; font-size: 13px; }
+.glossary-list th, .glossary-list td { padding: 15px; border-bottom: 1px solid #edf0f4; min-width: 130px; overflow-wrap: anywhere; white-space: pre-wrap; }
+.glossary-list th { background: #f8fafc; color: #64748b; }
+.glossary-error { color: #b42318; }
+.glossary-suggestions ul { display: grid; gap: 10px; list-style: none; padding: 0; }
+.glossary-suggestions li { padding: 10px; background: #f4f7ff; border-radius: 6px; overflow-wrap: anywhere; }
+.glossary-suggestions strong { font-size: 12px; }
+.glossary-suggestions button { margin-top: 10px; }
+.glossary-workarea { display: grid; grid-template-columns: minmax(0, 1fr) 360px; align-items: start; gap: 18px; }
+.glossary-panel { background: white; border: 1px solid #dfe4ec; border-radius: 8px; min-width: 0; }
+.glossary-panel .glossary-form { margin: 0; border: 0; padding: 20px; }
+.glossary-panel label { font-size: 11px; }
+.glossary-role { font-size: 12px; color: #64748b; }
+.glossary-details { padding: 20px; display: grid; gap: 12px; }
+.glossary-details h2 { margin: 0; font-size: 19px; overflow-wrap: anywhere; }
+.glossary-details h3 { margin: 8px 0 0; color: #64748b; font-size: 12px; }
+.glossary-details p { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; font-size: 13px; }
+.glossary-details dl { margin: 0; font-size: 11px; }
+.glossary-details dt { color: #64748b; margin-top: 8px; }
+.glossary-details dd { margin: 3px 0; }
+.glossary-details button { padding: 8px; border: 1px solid #d8dee8; border-radius: 6px; cursor: pointer; }
+.glossary-details button:disabled { cursor: default; opacity: .5; }
+.glossary-status { display: inline-block; justify-self: start; border-radius: 99px; padding: 4px 8px; font-size: 11px; white-space: nowrap; }
+.glossary-status.approved { background: #e9f9ef; color: #20844b; }
+.glossary-status.pending { background: #fff7df; color: #9a6700; }
+.glossary-status.archived { background: #edf0f4; color: #64748b; }
+.glossary-selected { background: #f4f7ff; }
+.glossary-term { border: 0; padding: 0; background: none; color: #3156c8; text-align: left; cursor: pointer; font-weight: 600; }
+.glossary-review { display: grid; gap: 12px; border-top: 1px solid #edf0f4; padding-top: 14px; }
+.glossary-confirm { padding: 12px; background: #fff7ed; border-radius: 6px; }
+.glossary-confirm button { margin: 8px 4px 0 0; }
+.glossary-variants { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; }
+.glossary-variants button { width: 100%; text-align: left; overflow-wrap: anywhere; font-size: 11px; }
+.glossary-toolbar label:first-child { flex: 2; }
+.glossary-toolbar label { min-width: 130px; }
+.glossary-toolbar > button { align-self: end; }
+.glossary-suggestions button + button { margin-left: 4px; }
+.glossary-quick { display: grid; gap: 9px; margin-top: 12px; padding-top: 12px; border-top: 1px solid #dfe4ec; }
+.glossary-quick label { display: grid; gap: 5px; color: #64748b; font-size: 11px; }
+.glossary-quick input, .glossary-quick textarea { padding: 8px; font-size: 12px; }
+@media (max-width: 1100px) { .glossary-workarea { grid-template-columns: 1fr; } }

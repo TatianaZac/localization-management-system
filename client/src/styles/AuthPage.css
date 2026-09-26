@@ -1,0 +1,28 @@
+/* Цей файл оформлює екран входу та реєстрації. */
+
+.auth-page { min-height: 100vh; display: grid; grid-template-columns: minmax(320px, 1fr) minmax(360px, 520px); background: #f5f7fb; }
+.auth-intro { display: flex; flex-direction: column; justify-content: space-between; padding: clamp(36px, 7vw, 90px); background: linear-gradient(145deg, #10233a, #244f84); color: white; }
+.auth-brand { display: flex; align-items: center; gap: 10px; }
+.auth-brand span { width: 36px; height: 36px; display: grid; place-items: center; border-radius: 9px; background: white; color: #3156c8; font-weight: 900; }
+.auth-intro h1 { max-width: 620px; margin: 8px 0 16px; font-size: clamp(34px, 5vw, 60px); line-height: 1.05; }
+.auth-intro > div:last-child > p:last-child { max-width: 580px; color: #c5d5e7; line-height: 1.65; }
+.auth-card { align-self: center; margin: 32px; padding: 34px; border: 1px solid #e2e8f0; border-radius: 16px; background: white; box-shadow: 0 18px 55px rgb(30 41 59 / 10%); }
+.auth-tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; padding: 4px; border-radius: 9px; background: #f1f4f8; }
+.auth-tabs button { border: 0; border-radius: 6px; padding: 9px; background: transparent; color: #64748b; font-weight: 700; }
+.auth-tabs button.active { background: white; color: #3156c8; box-shadow: 0 2px 8px rgb(30 41 59 / 8%); }
+.auth-heading { margin: 28px 0 22px; }
+.auth-heading h2 { margin: 0 0 7px; }
+.auth-heading p { margin: 0; color: #64748b; font-size: 13px; }
+.auth-form { display: grid; gap: 16px; }
+.auth-form label { display: grid; gap: 6px; color: #475569; font-size: 12px; font-weight: 700; }
+
+@media (max-width: 800px) {
+  .auth-page { grid-template-columns: 1fr; }
+  .auth-intro { min-height: 260px; gap: 50px; padding: 32px; }
+  .auth-intro h1 { font-size: 36px; }
+  .auth-card { width: min(100% - 32px, 520px); margin: 30px auto; }
+}
+
+@media (max-width: 480px) {
+  .auth-card { padding: 24px 18px; }
+}
