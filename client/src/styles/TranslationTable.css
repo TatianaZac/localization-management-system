@@ -1,112 +1,43 @@
-.table-card {
+/* Цей файл оформлює таблицю ключів, поля перекладу, статуси та дії рядків. */
+
+.translation-table-card {
+  min-width: 0;
   overflow: hidden;
+  border: 1px solid #dfe4ec;
+  border-radius: 7px;
+  background: white;
 }
 
-.table-heading {
-  padding: 22px;
-  border-bottom: 1px solid #edf2f7;
-}
+.table-scroll { overflow-x: auto; }
+.translation-table { width: 100%; min-width: 850px; table-layout: fixed; border-collapse: collapse; text-align: left; }
+/* Єдина сітка для всіх версій і мов: вміст більше не пересуває колонки. */
+.translation-col-select { width: 44px; }
+.translation-col-key, .translation-col-source { width: 24%; }
+.translation-col-status { width: 156px; }
+.translation-table th, .translation-table td { padding: 11px 12px; border-bottom: 1px solid #edf0f4; vertical-align: middle; }
+.translation-table th { background: #f8fafc; color: #748094; font-size: 10px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; }
+.translation-table td { height: 60px; color: #334155; font-size: 12px; line-height: 18px; overflow-wrap: anywhere; }
+.translation-table th { height: 36px; line-height: 14px; }
+.translation-table tbody tr { transition: background 100ms ease; }
+.translation-table tbody tr:hover, .translation-table .selected-row { background: #f4f7ff; }
+.translation-table .selected-row { box-shadow: inset 3px 0 #3156c8; }
+.select-cell { width: 34px; }
+.select-cell input { display: block; margin: 0; width: 14px; height: 14px; accent-color: #3156c8; }
+.key-code { color: #3156c8; font-size: 11px; }
+.source-copy { color: #263244; }
+.translation-input { display: block; width: 100%; min-width: 0; height: 34px; padding: 7px 8px; border-radius: 5px; font-size: 12px; line-height: 18px; }
 
-.table-heading h2 {
-  margin-bottom: 0;
-}
+.status { display: inline-flex; align-items: center; white-space: nowrap; padding: 4px 7px; border-radius: 99px; font-size: 10px; font-weight: 800; }
+.status.new { background: #f1f5f9; color: #64748b; }
+.status.translated { background: #fff7df; color: #9a6700; }
+.status.reviewed { background: #e9f9ef; color: #20844b; }
+.status.outdated { background: #fff0f0; color: #cf3d3d; }
+.status.needs_revision { background: #fff0e5; color: #b45309; }
 
-.table-heading > span {
-  color: #627d98;
-  font-size: 13px;
-}
-
-.table-scroll {
-  overflow-x: auto;
-}
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-  text-align: left;
-}
-
-th,
-td {
-  padding: 15px 22px;
-  vertical-align: top;
-  border-bottom: 1px solid #edf2f7;
-}
-
-th {
-  color: #627d98;
-  font-size: 11px;
-  letter-spacing: 0.07em;
-  text-transform: uppercase;
-}
-
-td {
-  color: #334e68;
-  font-size: 14px;
-}
-
-td:first-child {
-  width: 23%;
-}
-
-td:nth-child(2) {
-  width: 31%;
-}
-
-td small {
-  display: block;
-  margin-top: 6px;
-  color: #829ab1;
-  font-size: 11px;
-}
-
-.translation-row {
-  justify-content: flex-start;
-  min-width: 230px;
-  gap: 9px;
-}
-
-.translation-row + .translation-row {
-  margin-top: 9px;
-}
-
-.translation-row .status {
-  margin-left: auto;
-}
-
-.status.new {
-  background: #edf2f7;
-  color: #52616b;
-}
-
-.status.translated {
-  background: #e1effe;
-  color: #175da8;
-}
-
-.status.reviewed {
-  background: #e6fffa;
-  color: #1d6f65;
-}
-
-.status.outdated {
-  background: #fff5eb;
-  color: #b45309;
-}
-
-.no-translations,
-.empty-table {
-  color: #627d98;
-}
-
-.empty-table {
-  margin: 0;
-  padding: 42px 22px;
-}
-
-@media (max-width: 760px) {
-  th,
-  td {
-    padding: 13px;
-  }
-}
+/* Підказка займає нижній відступ, а не збільшує рядок під час введення. */
+.translation-edit-cell { position: relative; }
+.translation-save-hint { position: absolute; bottom: 0; left: 12px; right: 12px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; color: #9a6700; font-size: 10px; line-height: 12px; }
+.empty-table { min-height: 270px; display: grid; place-content: center; justify-items: center; gap: 5px; color: #8a95a7; }
+.empty-table strong { color: #344054; }
+.table-footer { display: flex; flex-wrap: wrap; gap: 8px; padding: 10px 14px; color: #8a95a7; font-size: 10px; }
+.table-footer > span:last-child { margin-left: auto; }

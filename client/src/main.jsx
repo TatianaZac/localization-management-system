@@ -1,3 +1,5 @@
+// Цей файл є точкою входу клієнта та монтує кореневий React-компонент у DOM.
+
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'

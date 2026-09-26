@@ -1,3 +1,5 @@
+// Цей файл налаштовує та експортує єдиний клієнт Prisma для доступу до PostgreSQL.
+
 require("dotenv").config();
 
 const { PrismaClient } = require("@prisma/client");

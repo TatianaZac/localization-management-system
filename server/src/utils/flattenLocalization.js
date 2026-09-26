@@ -1,3 +1,6 @@
+// Цей файл перетворює вкладений об'єкт локалізації на плоский список ключів і значень.
+
+// Рекурсивно розгортає вкладені ключі JSON у записи з крапковими шляхами.
 function flattenLocalizationObject(value, prefix = "") {
     if (!value || typeof value !== "object" || Array.isArray(value)) {
         throw new Error("Localization file must contain a JSON object");

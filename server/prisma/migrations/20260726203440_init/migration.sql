@@ -1,3 +1,5 @@
+-- Цей файл створює початкову таблицю користувачів у базі даних.
+
 -- CreateTable
 CREATE TABLE "User" (
     "id" SERIAL NOT NULL,

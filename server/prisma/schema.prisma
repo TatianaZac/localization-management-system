@@ -1,3 +1,5 @@
+// Цей файл описує моделі, зв'язки та статуси даних системи локалізації для Prisma.
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -11,14 +13,41 @@ enum TranslationStatus {
   TRANSLATED
   REVIEWED
   OUTDATED
+  NEEDS_REVISION
+}
+
+enum ProjectRole {
+  EDITOR
+  REVIEWER
+}
+
+enum GlossaryStatus {
+  PENDING
+  APPROVED
+  ARCHIVED
 }
 
 model User {
+  id           Int       @id @default(autoincrement())
+  name         String
+  email        String    @unique
+  passwordHash String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  projects     Project[]
+  memberships ProjectMember[]
+  sessions     Session[]
+}
+
+model Session {
   id        Int      @id @default(autoincrement())
-  name      String
-  email     String   @unique
+  userId    Int
+  tokenHash String   @unique
+  expiresAt DateTime
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
 
 model Project {
@@ -28,8 +57,28 @@ model Project {
   sourceLocaleCode String           @default("en")
   createdAt        DateTime         @default(now())
   updatedAt        DateTime         @updatedAt
+  ownerId          Int?
+  owner            User?            @relation(fields: [ownerId], references: [id], onDelete: SetNull)
   locales          Locale[]
+  members          ProjectMember[]
   translationKeys  TranslationKey[]
+  glossaryConcepts GlossaryConcept[]
+  pages            LocalizationPage[]
+
+  @@index([ownerId])
+}
+
+model ProjectMember {
+  id        Int         @id @default(autoincrement())
+  projectId Int
+  userId    Int
+  role      ProjectRole
+  createdAt DateTime    @default(now())
+  project   Project     @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, userId])
+  @@index([userId])
 }
 
 model Locale {
@@ -41,13 +90,76 @@ model Locale {
   createdAt    DateTime      @default(now())
   project      Project       @relation(fields: [projectId], references: [id], onDelete: Cascade)
   translations Translation[]
+  glossaryEntries GlossaryEntry[]
 
   @@unique([projectId, code])
+}
+
+// Спільне поняття об'єднує переклади різними мовами.
+model GlossaryConcept {
+  id             Int @id @default(autoincrement())
+  projectId      Int
+  term           String
+  normalizedTerm String
+  definition     String @default("")
+  project        Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  entries        GlossaryEntry[]
+  @@unique([projectId, normalizedTerm])
+}
+
+// Нова пропозиція не змінює чинну рекомендацію до погодження.
+model GlossaryEntry {
+  id             Int @id @default(autoincrement())
+  localeId       Int
+  conceptId      Int
+  concept        GlossaryConcept @relation(fields: [conceptId], references: [id], onDelete: Cascade)
+  translation    String
+  note           String @default("")
+  example        String @default("")
+  status         GlossaryStatus @default(PENDING)
+  authorId       Int?
+  authorName     String?
+  reviewerName   String?
+  reviewerId     Int?
+  reviewedAt     DateTime?
+  decisionNote   String @default("")
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  locale         Locale @relation(fields: [localeId], references: [id], onDelete: Cascade)
+
+  @@index([conceptId, localeId])
+}
+
+// Сторінка має власну послідовність версій, незалежну від інших сторінок.
+model LocalizationPage {
+  id Int @id @default(autoincrement())
+  projectId Int
+  name String
+  createdAt DateTime @default(now())
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  versions PageVersion[]
+  @@unique([projectId, name])
+}
+
+model PageVersion {
+  id Int @id @default(autoincrement())
+  pageId Int
+  number Int
+  name String?
+  deletedAt DateTime?
+  fileName String
+  createdAt DateTime @default(now())
+  summary Json?
+  page LocalizationPage @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  translationKeys TranslationKey[]
+  @@unique([pageId, number])
 }
 
 model TranslationKey {
   id           Int           @id @default(autoincrement())
   projectId    Int
+  pageVersionId Int
+  pageVersion PageVersion @relation(fields: [pageVersionId], references: [id], onDelete: Cascade)
   key          String
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
@@ -55,7 +167,8 @@ model TranslationKey {
   sourceTexts  SourceText[]
   translations Translation[]
 
-  @@unique([projectId, key])
+  @@unique([pageVersionId, key])
+  @@index([projectId])
 }
 
 model SourceText {
@@ -75,6 +188,10 @@ model Translation {
   translationKeyId Int
   localeId         Int
   value            String?
+  comment          String?
+  reviewReason     String?
+  copiedFromTranslationId Int?
+  history          TranslationHistory[]
   status           TranslationStatus @default(NEW)
   sourceVersion    Int?
   createdAt        DateTime          @default(now())
@@ -83,4 +200,21 @@ model Translation {
   locale           Locale            @relation(fields: [localeId], references: [id], onDelete: Cascade)
 
   @@unique([translationKeyId, localeId])
+}
+
+// Знімок дії зберігає ім'я та роль на момент зміни, навіть після зміни учасника.
+model TranslationHistory {
+  id            Int @id @default(autoincrement())
+  translationId Int
+  actorId       Int
+  actorName     String
+  actorRole     ProjectRole
+  value         String?
+  status        TranslationStatus
+  sourceVersion Int?
+  reviewReason  String?
+  createdAt     DateTime @default(now())
+  translation   Translation @relation(fields: [translationId], references: [id], onDelete: Cascade)
+
+  @@index([translationId, createdAt])
 }

@@ -1,190 +1,226 @@
+// Цей файл показує список проєктів і форму створення нового проєкту.
+
 import { useEffect, useState } from 'react'
 import {
-  createLocale,
   createProject,
-  getProject,
+  deleteProject,
   getProjects,
-  importSourceFile,
+  updateProject,
 } from '../api/localizationApi'
-import JsonImport from '../components/projects/JsonImport'
-import LocalePanel from '../components/projects/LocalePanel'
-import ProjectSidebar from '../components/projects/ProjectSidebar'
-import TranslationTable from '../components/projects/TranslationTable'
+import CreateProjectForm from '../components/projects/CreateProjectForm'
+import EditProjectForm from '../components/projects/EditProjectForm'
+import { ROLE_LABELS } from '../components/projects/ProjectMembers'
 import '../styles/ProjectsPage.css'
 
-function getErrorMessage(error, fallbackMessage) {
-  return error instanceof Error ? error.message : fallbackMessage
-}
-
-function ProjectsPage() {
+// Завантажує проєкти та керує станами сторінки їх створення і відкриття.
+function ProjectsPage({ onLogout, onOpenProject, user }) {
   const [projects, setProjects] = useState([])
-  const [selectedProject, setSelectedProject] = useState(null)
-  const [notice, setNotice] = useState('')
-  const [error, setError] = useState('')
+  const [isLoading, setIsLoading] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
-
-  async function loadProjects() {
-    const data = await getProjects()
-    setProjects(data)
-  }
-
-  async function loadProject(projectId) {
-    const data = await getProject(projectId)
-    setSelectedProject(data)
-  }
+  const [editingProject, setEditingProject] = useState(null)
+  const [deleteCandidate, setDeleteCandidate] = useState(null)
+  const [error, setError] = useState('')
+  const [notice, setNotice] = useState('')
 
   useEffect(() => {
-    void loadProjects().catch((requestError) => {
-      setError(getErrorMessage(requestError, 'Не вдалося завантажити проєкти'))
-    })
+    getProjects() //Запитуємо список проєктів. Можливі два результати: отримали список або сталася помилка.
+      .then(setProjects) //.then — що зробити, якщо отримали список. Коли отримаєш список, передай його у setProjects
+      .catch((requestError) => setError(requestError.message))
+      .finally(() => setIsLoading(false))
   }, [])
 
-  async function selectProject(projectId) {
-    setError('')
-    setNotice('')
-
-    try {
-      await loadProject(projectId)
-    } catch (requestError) {
-      setError(getErrorMessage(requestError, 'Не вдалося відкрити проєкт'))
-    }
-  }
-
-  async function handleCreateProject({ name, description }) {
+  // Створює проєкт через API й після успіху відкриває його редактор.
+  async function handleCreateProject(projectData) {
     setError('')
     setNotice('')
     setIsSaving(true)
 
     try {
-      const project = await createProject({
-        name,
-        description,
-        sourceLocale: { code: 'en', name: 'English' },
-      })
-
-      await loadProject(project.id)
-      await loadProjects()
-      setNotice('Проєкт створено. Тепер додай мову перекладу та імпортуй файл.')
+      const project = await createProject(projectData)
+      // Новий проєкт одразу відкривається: кори  стувачу не треба шукати його у списку.
+      onOpenProject(project.id)
       return true
     } catch (requestError) {
-      setError(getErrorMessage(requestError, 'Не вдалося створити проєкт'))
+      setError(requestError.message)
       return false
     } finally {
       setIsSaving(false)
     }
   }
 
-  async function handleAddLocale(locale) {
-    if (!selectedProject) {
-      return false
-    }
+  // Зберігає змінені дані та оновлює відповідну картку без повторного запиту списку.
+  async function handleUpdateProject(projectData) {
+    if (!editingProject) return
 
     setError('')
     setNotice('')
     setIsSaving(true)
 
     try {
-      await createLocale(selectedProject.id, locale)
-      await loadProject(selectedProject.id)
-      await loadProjects()
-      setNotice('Мову перекладу додано.')
-      return true
+      const updatedProject = await updateProject(editingProject.id, projectData)
+      setProjects((currentProjects) => currentProjects.map((project) => (
+        project.id === updatedProject.id
+          ? { ...project, ...updatedProject }
+          : project
+      )))
+      setEditingProject(null)
+      setNotice('Дані проєкту оновлено.')
     } catch (requestError) {
-      setError(getErrorMessage(requestError, 'Не вдалося додати мову'))
-      return false
+      setError(requestError.message)
     } finally {
       setIsSaving(false)
     }
   }
 
-  async function handleImport(content) {
-    if (!selectedProject) {
-      return
-    }
+  // Видаляє лише проєкт, який користувач явно підтвердив у діалоговому вікні.
+  async function handleDeleteProject() {
+    if (!deleteCandidate) return
 
     setError('')
     setNotice('')
     setIsSaving(true)
 
     try {
-      const summary = await importSourceFile(selectedProject.id, content)
-      await loadProject(selectedProject.id)
-      await loadProjects()
-      setNotice(
-        'Імпорт завершено: нових ключів — ' + summary.created +
-        ', оновлених — ' + summary.updated +
-        ', без змін — ' + summary.unchanged + '.',
-      )
+      await deleteProject(deleteCandidate.id)
+      setProjects((currentProjects) => currentProjects.filter(
+        (project) => project.id !== deleteCandidate.id,
+      ))
+      if (editingProject?.id === deleteCandidate.id) setEditingProject(null)
+      setDeleteCandidate(null)
+      setNotice('Проєкт видалено.')
     } catch (requestError) {
-      setError('Імпорт не виконано: ' + getErrorMessage(requestError, 'Невідома помилка'))
+      setError(requestError.message)
     } finally {
       setIsSaving(false)
     }
-  }
-
-  function handleImportError(importError) {
-    setNotice('')
-    setError('Імпорт не виконано: ' + getErrorMessage(importError, 'Файл має бути коректним JSON'))
   }
 
   return (
-    <main className="app-shell">
-      <ProjectSidebar
-        isSaving={isSaving}
-        onCreateProject={handleCreateProject}
-        onSelectProject={selectProject}
-        projects={projects}
-        selectedProjectId={selectedProject?.id}
-      />
+    <main className="projects-home">
+      <header className="home-header">
+        <div className="home-brand">
+          <span className="brand-symbol">L</span>
+          <span>
+            <strong>LocaleFlow</strong>
+            <small>Localization workspace</small>
+          </span>
+        </div>
+        <div className="home-user">
+          <span className="user-chip">{user.name.slice(0, 2).toUpperCase()}</span>
+          <span><strong>{user.name}</strong><small>Користувач LocaleFlow</small></span>
+          <button onClick={onLogout} type="button">Вийти</button>
+        </div>
+      </header>
 
-      <section className="workspace">
-        <header className="workspace-header">
-          <div>
-            <p className="eyebrow">Інформаційна система локалізації</p>
-            <h1>{selectedProject ? selectedProject.name : 'Почнімо з проєкту'}</h1>
-            <p className="subtitle">
-              {selectedProject?.description ?? 'Створи проєкт, додай мову перекладу та імпортуй JSON-файл.'}
-            </p>
-          </div>
-          {selectedProject && <span className="project-id">Проєкт #{selectedProject.id}</span>}
-        </header>
+      <section className="home-content">
+        <div className="home-intro">
+          <p className="eyebrow">Робочий простір</p>
+          <h1>Мої проєкти</h1>
+          <p>Створюй локалізаційні проєкти, імпортуй оригінали та керуй перекладами.</p>
+        </div>
 
         {error && <div className="message error" role="alert">{error}</div>}
-        {notice && <div className="message success">{notice}</div>}
+        {notice && <div className="message success" role="status">{notice}</div>}
 
-        {!selectedProject ? (
-          <section className="empty-state">
-            <div className="empty-icon">1</div>
-            <h2>Створи перший локалізаційний проєкт</h2>
-            <p>
-              Англійська мова створиться автоматично як джерело. Потім можна додати українську
-              та завантажити приклад <code>en.json</code>.
-            </p>
+        <div className="projects-layout">
+          <section className="project-collection">
+            <div className="section-heading">
+              <h2>Проєкти</h2>
+              <span>{projects.length}</span>
+            </div>
+
+            {isLoading ? (
+              <p className="loading-copy">Завантаження проєктів…</p>
+            ) : projects.length === 0 ? (
+              <div className="project-empty">
+                <span>＋</span>
+                <h3>Ще немає проєктів</h3>
+                <p>Заповни форму праворуч, щоб створити перший.</p>
+              </div>
+            ) : (
+              <div className="project-grid">
+                {projects.map((project) => (
+                  <article
+                    className="project-tile"
+                    key={project.id}
+                  >
+                    <button
+                      className="project-tile-main"
+                      onClick={() => onOpenProject(project.id)}
+                      type="button"
+                    >
+                      <span className="project-tile-icon">{project.name.slice(0, 1).toUpperCase()}</span>
+                      <span className="project-tile-copy">
+                        <strong>{project.name}</strong>
+                        <small>{project.description || 'Без опису'}</small>
+                        <span>{project.keyCount} ключів · {project.localeCount} мов</span>
+                        <em className={'project-role ' + project.currentUserRole.toLowerCase()}>{ROLE_LABELS[project.currentUserRole]}</em>
+                      </span>
+                      <span className="tile-arrow">→</span>
+                    </button>
+                    {project.currentUserRole === 'OWNER' && <div className="project-tile-actions">
+                      <button
+                        aria-label={'Редагувати проєкт ' + project.name}
+                        onClick={() => {
+                          setEditingProject(project)
+                          setError('')
+                          setNotice('')
+                        }}
+                        title="Редагувати"
+                        type="button"
+                      >
+                        ✎
+                      </button>
+                      <button
+                        aria-label={'Видалити проєкт ' + project.name}
+                        className="danger-icon"
+                        onClick={() => setDeleteCandidate(project)}
+                        title="Видалити"
+                        type="button"
+                      >
+                        ×
+                      </button>
+                    </div>}
+                  </article>
+                ))}
+              </div>
+            )}
           </section>
-        ) : (
-          <>
-            <section className="dashboard-grid">
-              <LocalePanel
-                isSaving={isSaving}
-                locales={selectedProject.locales}
-                onAddLocale={handleAddLocale}
-              />
-              <JsonImport
-                isSaving={isSaving}
-                onImport={handleImport}
-                onImportError={handleImportError}
-              />
-              <article className="card metric-card">
-                <p className="eyebrow">Вміст</p>
-                <strong className="metric">{selectedProject.translationKeys.length}</strong>
-                <span>локалізаційних ключів</span>
-              </article>
-            </section>
 
-            <TranslationTable translationKeys={selectedProject.translationKeys} />
-          </>
-        )}
+          <aside className="create-project-card">
+            {editingProject ? (
+              <EditProjectForm
+                isSaving={isSaving}
+                onCancel={() => setEditingProject(null)}
+                onSave={handleUpdateProject}
+                project={editingProject}
+              />
+            ) : (
+              <CreateProjectForm isSaving={isSaving} onCreate={handleCreateProject} />
+            )}
+          </aside>
+        </div>
       </section>
+
+      {deleteCandidate && (
+        <div className="dialog-backdrop" role="presentation">
+          <section aria-labelledby="delete-project-title" aria-modal="true" className="confirm-dialog" role="dialog">
+            <span className="dialog-warning">!</span>
+            <h2 id="delete-project-title">Видалити проєкт?</h2>
+            <p>
+              Проєкт <strong>{deleteCandidate.name}</strong>, його мови, ключі та переклади буде видалено без можливості відновлення.
+            </p>
+            <div className="form-actions">
+              <button className="button secondary" disabled={isSaving} onClick={() => setDeleteCandidate(null)} type="button">
+                Скасувати
+              </button>
+              <button className="button danger" disabled={isSaving} onClick={handleDeleteProject} type="button">
+                {isSaving ? 'Видалення…' : 'Так, видалити'}
+              </button>
+            </div>
+          </section>
+        </div>
+      )}
     </main>
   )
 }

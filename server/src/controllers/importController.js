@@ -1,8 +1,11 @@
+// Цей файл приймає JSON вихідної локалі та передає його сервісу імпорту.
+
 const prisma = require("../prisma");
 const { importSourceTexts } = require("../services/sourceImportService");
 const { getLocaleCode, getProjectId } = require("../utils/validation");
 const { sendNotFound } = require("../utils/sendNotFound");
 
+// Перевіряє проєкт і вміст запиту, а потім імпортує вихідні тексти.
 async function importSourceFile(req, res, next) {
     try {
         const projectId = getProjectId(req.params.projectId);
@@ -40,7 +43,10 @@ async function importSourceFile(req, res, next) {
         const content = Object.prototype.hasOwnProperty.call(req.body, "content")
             ? req.body.content
             : req.body;
-        const summary = await importSourceTexts(project, content);
+        const summary = await importSourceTexts(project, content, {
+            pageId: req.body.pageId, pageName: req.body.pageName, fileName: req.body.fileName,
+            versionName: req.body.versionName
+        });
 
         res.json(summary);
     } catch (error) {

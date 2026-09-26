@@ -1,3 +1,5 @@
+// Цей файл є точкою запуску HTTP-сервера та відкриває порт застосунку.
+
 require("dotenv").config();
 
 const app = require("./app");

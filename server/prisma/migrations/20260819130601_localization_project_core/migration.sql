@@ -1,3 +1,5 @@
+-- Цей файл створює основну схему проєктів, локалей, вихідних текстів і перекладів.
+
 -- CreateEnum
 CREATE TYPE "TranslationStatus" AS ENUM ('NEW', 'TRANSLATED', 'REVIEWED', 'OUTDATED');
 

@@ -1,13 +1,23 @@
+// Цей файл містить керовану React-форму для створення локалізаційного проєкту.
+
 import { useState } from 'react'
 
+// Збирає назву, опис і дані вихідної мови та передає їх батьківському компоненту.
 function CreateProjectForm({ isSaving, onCreate }) {
   const [name, setName] = useState('')
   const [description, setDescription] = useState('')
+  const [sourceCode, setSourceCode] = useState('en')
+  const [sourceName, setSourceName] = useState('English')
 
+  // Скасовує стандартне надсилання форми, створює проєкт і очищає успішно надіслані поля.
   async function handleSubmit(event) {
     event.preventDefault()
 
-    const wasCreated = await onCreate({ name, description })
+    const wasCreated = await onCreate({
+      name,
+      description,
+      sourceLocale: { code: sourceCode, name: sourceName },
+    })
 
     if (wasCreated) {
       setName('')
@@ -36,8 +46,28 @@ function CreateProjectForm({ isSaving, onCreate }) {
           rows={2}
         />
       </label>
+      <div className="form-row">
+        <label>
+          Код оригіналу
+          <input
+            value={sourceCode}
+            onChange={(event) => setSourceCode(event.target.value)}
+            placeholder="en"
+            required
+          />
+        </label>
+        <label>
+          Мова оригіналу
+          <input
+            value={sourceName}
+            onChange={(event) => setSourceName(event.target.value)}
+            placeholder="English"
+            required
+          />
+        </label>
+      </div>
       <button className="button primary full-width" disabled={isSaving} type="submit">
-        Створити проєкт
+        {isSaving ? 'Створення…' : 'Створити й відкрити проєкт'}
       </button>
     </form>
   )
