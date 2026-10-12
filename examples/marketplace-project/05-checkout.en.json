@@ -1,0 +1,83 @@
+{
+  "checkout": {
+    "header": {
+      "title": "Secure checkout",
+      "step": "Step {{current}} of {{total}}",
+      "returnToCart": "Return to cart"
+    },
+    "contact": {
+      "title": "Contact information",
+      "email": "Email address",
+      "phone": "Phone number",
+      "updates": "Send me order updates by text message"
+    },
+    "address": {
+      "shippingTitle": "Shipping address",
+      "billingTitle": "Billing address",
+      "firstName": "First name",
+      "lastName": "Last name",
+      "company": "Company name (optional)",
+      "lineOne": "Street address",
+      "lineTwo": "Apartment, suite, or unit (optional)",
+      "city": "City",
+      "region": "State or region",
+      "postalCode": "Postal code",
+      "country": "Country",
+      "sameAsShipping": "Use shipping address for billing",
+      "save": "Save this address to my account"
+    },
+    "delivery": {
+      "title": "Delivery method",
+      "standard": {
+        "name": "Standard delivery",
+        "description": "Delivered in 3–5 business days"
+      },
+      "express": {
+        "name": "Express delivery",
+        "description": "Delivered on the next business day"
+      },
+      "pickup": {
+        "name": "Store pickup",
+        "description": "Collect your order from a nearby store"
+      }
+    },
+    "payment": {
+      "title": "Payment",
+      "secureHint": "Your payment details are encrypted and secure",
+      "cardNumber": "Card number",
+      "cardholder": "Name on card",
+      "expiry": "Expiration date",
+      "securityCode": "Security code",
+      "securityCodeHint": "Three digits on the back of your card",
+      "saveCard": "Save this card for future purchases"
+    },
+    "summary": {
+      "title": "Order summary",
+      "items": "Items subtotal",
+      "shipping": "Shipping",
+      "discount": "Discount",
+      "tax": "Estimated tax",
+      "total": "Order total",
+      "promoCode": "Promo code",
+      "applyPromo": "Apply code",
+      "removePromo": "Remove promo code"
+    },
+    "validation": {
+      "required": "This field is required",
+      "email": "Enter a valid email address",
+      "phone": "Enter a valid phone number",
+      "postalCode": "Enter a valid postal code",
+      "cardNumber": "Check the card number and try again",
+      "expiredCard": "This card has expired",
+      "paymentFailed": "Payment could not be completed. Try another payment method."
+    },
+    "confirmation": {
+      "title": "Thank you for your order",
+      "description": "A confirmation email has been sent to {{email}}.",
+      "orderNumber": "Order number: {{number}}",
+      "track": "Track your order",
+      "continueShopping": "Continue shopping"
+    }
+  }
+}
+

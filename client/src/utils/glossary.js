@@ -10,8 +10,11 @@ export function matchesGlossaryTerm(source, term) {
   while (start !== -1) {
     const before = Array.from(text.slice(0, start)).at(-1) ?? ''
     const after = Array.from(text.slice(start + needle.length))[0] ?? ''
-    if ((!word.test(needle[0]) || !word.test(before))
-      && (!word.test(needle.at(-1)) || !word.test(after))) return true
+    if (
+      (!word.test(needle[0]) || !word.test(before)) &&
+      (!word.test(needle.at(-1)) || !word.test(after))
+    )
+      return true
     start = text.indexOf(needle, start + 1)
   }
   return false

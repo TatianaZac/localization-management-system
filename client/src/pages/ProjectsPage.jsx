@@ -1,12 +1,7 @@
 // Цей файл показує список проєктів і форму створення нового проєкту.
 
 import { useEffect, useState } from 'react'
-import {
-  createProject,
-  deleteProject,
-  getProjects,
-  updateProject,
-} from '../api/localizationApi'
+import { createProject, deleteProject, getProjects, updateProject } from '../api/localizationApi'
 import CreateProjectForm from '../components/projects/CreateProjectForm'
 import EditProjectForm from '../components/projects/EditProjectForm'
 import { ROLE_LABELS } from '../components/projects/ProjectMembers'
@@ -58,11 +53,11 @@ function ProjectsPage({ onLogout, onOpenProject, user }) {
 
     try {
       const updatedProject = await updateProject(editingProject.id, projectData)
-      setProjects((currentProjects) => currentProjects.map((project) => (
-        project.id === updatedProject.id
-          ? { ...project, ...updatedProject }
-          : project
-      )))
+      setProjects((currentProjects) =>
+        currentProjects.map((project) =>
+          project.id === updatedProject.id ? { ...project, ...updatedProject } : project
+        )
+      )
       setEditingProject(null)
       setNotice('Дані проєкту оновлено.')
     } catch (requestError) {
@@ -82,9 +77,9 @@ function ProjectsPage({ onLogout, onOpenProject, user }) {
 
     try {
       await deleteProject(deleteCandidate.id)
-      setProjects((currentProjects) => currentProjects.filter(
-        (project) => project.id !== deleteCandidate.id,
-      ))
+      setProjects((currentProjects) =>
+        currentProjects.filter((project) => project.id !== deleteCandidate.id)
+      )
       if (editingProject?.id === deleteCandidate.id) setEditingProject(null)
       setDeleteCandidate(null)
       setNotice('Проєкт видалено.')
@@ -107,8 +102,13 @@ function ProjectsPage({ onLogout, onOpenProject, user }) {
         </div>
         <div className="home-user">
           <span className="user-chip">{user.name.slice(0, 2).toUpperCase()}</span>
-          <span><strong>{user.name}</strong><small>Користувач LocaleFlow</small></span>
-          <button onClick={onLogout} type="button">Вийти</button>
+          <span>
+            <strong>{user.name}</strong>
+            <small>Користувач LocaleFlow</small>
+          </span>
+          <button onClick={onLogout} type="button">
+            Вийти
+          </button>
         </div>
       </header>
 
@@ -119,8 +119,16 @@ function ProjectsPage({ onLogout, onOpenProject, user }) {
           <p>Створюй локалізаційні проєкти, імпортуй оригінали та керуй перекладами.</p>
         </div>
 
-        {error && <div className="message error" role="alert">{error}</div>}
-        {notice && <div className="message success" role="status">{notice}</div>}
+        {error && (
+          <div className="message error" role="alert">
+            {error}
+          </div>
+        )}
+        {notice && (
+          <div className="message success" role="status">
+            {notice}
+          </div>
+        )}
 
         <div className="projects-layout">
           <section className="project-collection">
@@ -140,47 +148,52 @@ function ProjectsPage({ onLogout, onOpenProject, user }) {
             ) : (
               <div className="project-grid">
                 {projects.map((project) => (
-                  <article
-                    className="project-tile"
-                    key={project.id}
-                  >
+                  <article className="project-tile" key={project.id}>
                     <button
                       className="project-tile-main"
                       onClick={() => onOpenProject(project.id)}
                       type="button"
                     >
-                      <span className="project-tile-icon">{project.name.slice(0, 1).toUpperCase()}</span>
+                      <span className="project-tile-icon">
+                        {project.name.slice(0, 1).toUpperCase()}
+                      </span>
                       <span className="project-tile-copy">
                         <strong>{project.name}</strong>
                         <small>{project.description || 'Без опису'}</small>
-                        <span>{project.keyCount} ключів · {project.localeCount} мов</span>
-                        <em className={'project-role ' + project.currentUserRole.toLowerCase()}>{ROLE_LABELS[project.currentUserRole]}</em>
+                        <span>
+                          {project.keyCount} ключів · {project.localeCount} мов
+                        </span>
+                        <em className={'project-role ' + project.currentUserRole.toLowerCase()}>
+                          {ROLE_LABELS[project.currentUserRole]}
+                        </em>
                       </span>
                       <span className="tile-arrow">→</span>
                     </button>
-                    {project.currentUserRole === 'OWNER' && <div className="project-tile-actions">
-                      <button
-                        aria-label={'Редагувати проєкт ' + project.name}
-                        onClick={() => {
-                          setEditingProject(project)
-                          setError('')
-                          setNotice('')
-                        }}
-                        title="Редагувати"
-                        type="button"
-                      >
-                        ✎
-                      </button>
-                      <button
-                        aria-label={'Видалити проєкт ' + project.name}
-                        className="danger-icon"
-                        onClick={() => setDeleteCandidate(project)}
-                        title="Видалити"
-                        type="button"
-                      >
-                        ×
-                      </button>
-                    </div>}
+                    {project.currentUserRole === 'OWNER' && (
+                      <div className="project-tile-actions">
+                        <button
+                          aria-label={'Редагувати проєкт ' + project.name}
+                          onClick={() => {
+                            setEditingProject(project)
+                            setError('')
+                            setNotice('')
+                          }}
+                          title="Редагувати"
+                          type="button"
+                        >
+                          ✎
+                        </button>
+                        <button
+                          aria-label={'Видалити проєкт ' + project.name}
+                          className="danger-icon"
+                          onClick={() => setDeleteCandidate(project)}
+                          title="Видалити"
+                          type="button"
+                        >
+                          ×
+                        </button>
+                      </div>
+                    )}
                   </article>
                 ))}
               </div>
@@ -204,17 +217,33 @@ function ProjectsPage({ onLogout, onOpenProject, user }) {
 
       {deleteCandidate && (
         <div className="dialog-backdrop" role="presentation">
-          <section aria-labelledby="delete-project-title" aria-modal="true" className="confirm-dialog" role="dialog">
+          <section
+            aria-labelledby="delete-project-title"
+            aria-modal="true"
+            className="confirm-dialog"
+            role="dialog"
+          >
             <span className="dialog-warning">!</span>
             <h2 id="delete-project-title">Видалити проєкт?</h2>
             <p>
-              Проєкт <strong>{deleteCandidate.name}</strong>, його мови, ключі та переклади буде видалено без можливості відновлення.
+              Проєкт <strong>{deleteCandidate.name}</strong>, його мови, ключі та переклади буде
+              видалено без можливості відновлення.
             </p>
             <div className="form-actions">
-              <button className="button secondary" disabled={isSaving} onClick={() => setDeleteCandidate(null)} type="button">
+              <button
+                className="button secondary"
+                disabled={isSaving}
+                onClick={() => setDeleteCandidate(null)}
+                type="button"
+              >
                 Скасувати
               </button>
-              <button className="button danger" disabled={isSaving} onClick={handleDeleteProject} type="button">
+              <button
+                className="button danger"
+                disabled={isSaving}
+                onClick={handleDeleteProject}
+                type="button"
+              >
                 {isSaving ? 'Видалення…' : 'Так, видалити'}
               </button>
             </div>

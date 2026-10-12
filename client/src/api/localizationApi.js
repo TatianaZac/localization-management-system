@@ -24,8 +24,8 @@ async function request(path, options = {}) {
     headers: {
       'Content-Type': 'application/json',
       ...(token ? { Authorization: 'Bearer ' + token } : {}),
-      ...options.headers,
-    },
+      ...options.headers
+    }
   })
 
   const body = await response.json().catch(() => null)
@@ -41,7 +41,7 @@ async function request(path, options = {}) {
 export function registerUser(credentials) {
   return request('/auth/register', {
     method: 'POST',
-    body: JSON.stringify(credentials),
+    body: JSON.stringify(credentials)
   })
 }
 
@@ -49,7 +49,7 @@ export function registerUser(credentials) {
 export function loginUser(credentials) {
   return request('/auth/login', {
     method: 'POST',
-    body: JSON.stringify(credentials),
+    body: JSON.stringify(credentials)
   })
 }
 
@@ -62,7 +62,8 @@ export function logoutUser() {
 }
 
 // Отримує список усіх локалізаційних проєктів.
-export function getProjects() { // Просить сервер повернути всі проєкти
+export function getProjects() {
+  // Просить сервер повернути всі проєкти
   return request('/projects') // Надішли запит на адресу і поверни результат.
 }
 
@@ -83,7 +84,7 @@ function selectionQuery(selection) {
 export function createProject(project) {
   return request('/projects', {
     method: 'POST',
-    body: JSON.stringify(project),
+    body: JSON.stringify(project)
   })
 }
 
@@ -91,14 +92,14 @@ export function createProject(project) {
 export function updateProject(projectId, project) {
   return request('/projects/' + projectId, {
     method: 'PATCH',
-    body: JSON.stringify(project),
+    body: JSON.stringify(project)
   })
 }
 
 // Видаляє проєкт разом із пов'язаними даними після підтвердження в інтерфейсі.
 export function deleteProject(projectId) {
   return request('/projects/' + projectId, {
-    method: 'DELETE',
+    method: 'DELETE'
   })
 }
 
@@ -111,20 +112,21 @@ export function getProjectMembers(projectId) {
 export function addProjectMember(projectId, member) {
   return request('/projects/' + projectId + '/members', {
     method: 'POST',
-    body: JSON.stringify(member),
+    body: JSON.stringify(member)
   })
 }
 
-export function updateProjectMember(projectId, memberId, role) {
+// Роль і призначені мови оновлюються одним запитом, але можуть змінюватися окремо.
+export function updateProjectMember(projectId, memberId, changes) {
   return request('/projects/' + projectId + '/members/' + memberId, {
     method: 'PATCH',
-    body: JSON.stringify({ role }),
+    body: JSON.stringify(changes)
   })
 }
 
 export function deleteProjectMember(projectId, memberId) {
   return request('/projects/' + projectId + '/members/' + memberId, {
-    method: 'DELETE',
+    method: 'DELETE'
   })
 }
 
@@ -132,7 +134,7 @@ export function deleteProjectMember(projectId, memberId) {
 export function createLocale(projectId, locale) {
   return request('/projects/' + projectId + '/locales', {
     method: 'POST',
-    body: JSON.stringify(locale),
+    body: JSON.stringify(locale)
   })
 }
 
@@ -140,22 +142,22 @@ export function createLocale(projectId, locale) {
 export function updateLocale(projectId, localeId, name) {
   return request('/projects/' + projectId + '/locales/' + localeId, {
     method: 'PATCH',
-    body: JSON.stringify({ name }),
+    body: JSON.stringify({ name })
   })
 }
 
 // Видаляє цільову мову разом із перекладами цією мовою.
 export function deleteLocale(projectId, localeId) {
   return request('/projects/' + projectId + '/locales/' + localeId, {
-    method: 'DELETE',
+    method: 'DELETE'
   })
 }
 
-// Імпортує JSON із текстами вихідної локалі проєкту.
+// Імпортує звичайний оригінал або один файл з оригіналом і готовим перекладом.
 export function importSourceFile(projectId, content, options = {}) {
   return request('/projects/' + projectId + '/import', {
     method: 'POST',
-    body: JSON.stringify({ content, ...options }),
+    body: JSON.stringify({ content, ...options })
   })
 }
 
@@ -164,19 +166,26 @@ export function deletePageVersion(projectId, versionId) {
   return request('/projects/' + projectId + '/versions/' + versionId, { method: 'DELETE' })
 }
 
-// Зберігає значення та статус окремого перекладу.
-export function updateTranslation(projectId, translationId, value, status, reviewReason) {
-  return request('/projects/' + projectId + '/translations/' + translationId, {
-    method: 'PATCH',
-    body: JSON.stringify({ value, status, reviewReason }),
+// Створює новий незмінний знімок сторінки з результату об’єднання двох версій.
+export function mergePageVersions(projectId, merge) {
+  return request('/projects/' + projectId + '/merge', {
+    method: 'POST',
+    body: JSON.stringify(merge)
   })
 }
 
-// Зберігає коментар до окремого перекладу.
-export function updateTranslationComment(projectId, translationId, comment) {
-  return request('/projects/' + projectId + '/translations/' + translationId + '/comment', {
+// Зберігає значення та статус окремого перекладу.
+export function updateTranslation(
+  projectId,
+  translationId,
+  value,
+  status,
+  reviewReason,
+  versionNumber
+) {
+  return request('/projects/' + projectId + '/translations/' + translationId, {
     method: 'PATCH',
-    body: JSON.stringify({ comment }),
+    body: JSON.stringify({ value, status, reviewReason, versionNumber })
   })
 }
 
@@ -188,26 +197,54 @@ export function getGlossary(projectId) {
 // Зміна терміна також є новою пропозицією, яку має погодити рецензент.
 export function saveGlossaryEntry(projectId, entryId, entry) {
   return request('/projects/' + projectId + '/glossary', {
-    method: 'POST', body: JSON.stringify(entry),
+    method: 'POST',
+    body: JSON.stringify(entry)
   })
+}
+
+// Рецензент напряму змінює термін без створення нової пропозиції.
+export function updateGlossaryEntry(projectId, entryId, entry) {
+  return request('/projects/' + projectId + '/glossary/' + entryId, {
+    method: 'PATCH',
+    body: JSON.stringify(entry)
+  })
+}
+
+// Остаточно видаляє вибраний запис глосарію.
+export function deleteGlossaryEntry(projectId, entryId) {
+  return request('/projects/' + projectId + '/glossary/' + entryId, { method: 'DELETE' })
 }
 
 // Надсилає рішення разом із версією запису для захисту від одночасних змін.
 export function reviewGlossaryEntry(projectId, entryId, decision) {
-  return request('/projects/' + projectId + '/glossary/' + entryId + '/review', { method: 'PATCH', body: JSON.stringify(decision) })
+  return request('/projects/' + projectId + '/glossary/' + entryId + '/review', {
+    method: 'PATCH',
+    body: JSON.stringify(decision)
+  })
 }
 
 // Оновлює спільне для всіх мов визначення поняття.
 export function updateGlossaryConcept(projectId, conceptId, definition) {
-  return request('/projects/' + projectId + '/glossary-concepts/' + conceptId, { method: 'PATCH', body: JSON.stringify({ definition }) })
+  return request('/projects/' + projectId + '/glossary-concepts/' + conceptId, {
+    method: 'PATCH',
+    body: JSON.stringify({ definition })
+  })
 }
 
 // Завантажує сформований JSON перекладу через тимчасове браузерне посилання.
-export async function downloadLocaleFile(projectId, localeCode, selection = {}, fileName = localeCode + '.json') {
+export async function downloadLocaleFile(
+  projectId,
+  localeCode,
+  selection = {},
+  fileName = localeCode + '.json'
+) {
   const token = getSessionToken()
-  const response = await fetch(API_URL + '/projects/' + projectId + '/export/' + localeCode + selectionQuery(selection), {
-    headers: token ? { Authorization: 'Bearer ' + token } : {},
-  })
+  const response = await fetch(
+    API_URL + '/projects/' + projectId + '/export/' + localeCode + selectionQuery(selection),
+    {
+      headers: token ? { Authorization: 'Bearer ' + token } : {}
+    }
+  )
 
   if (!response.ok) {
     const body = await response.json().catch(() => null)

@@ -2,31 +2,37 @@
 
 // Перетворює додатний цілочисельний параметр на число або повертає null.
 function getProjectId(value) {
-    if (!/^[1-9]\d*$/.test(value)) {
-        return null;
-    }
+  if (!/^[1-9]\d*$/.test(value)) {
+    return null
+  }
 
-    return Number(value);
+  return Number(value)
 }
 
 // Нормалізує довільне значення до обрізаного текстового рядка.
 function getText(value) {
-    return typeof value === "string" ? value.trim() : "";
+  return typeof value === 'string' ? value.trim() : ''
+}
+
+// Непорожній текст не повинен містити пробіли або інші пропуски після останнього символу.
+function hasTrailingWhitespace(value) {
+  return typeof value === 'string' && value.trim().length > 0 && value.trimEnd() !== value
 }
 
 // Нормалізує код локалі до нижнього регістру.
 function getLocaleCode(value) {
-    return getText(value).toLowerCase();
+  return getText(value).toLowerCase()
 }
 
 // Перевіряє, чи відповідає код локалі підтримуваному формату.
 function isValidLocaleCode(code) {
-    return /^[a-z]{2,3}(-[a-z]{2})?$/.test(code);
+  return /^[a-z]{2,3}(-[a-z]{2})?$/.test(code)
 }
 
 module.exports = {
-    getProjectId,
-    getText,
-    getLocaleCode,
-    isValidLocaleCode
-};
+  getProjectId,
+  getText,
+  hasTrailingWhitespace,
+  getLocaleCode,
+  isValidLocaleCode
+}

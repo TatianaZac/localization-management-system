@@ -1,0 +1,64 @@
+{
+  "product": {
+    "gallery": {
+      "label": "Product images",
+      "previous": "Previous image",
+      "next": "Next image",
+      "thumbnail": "View image {{number}}",
+      "zoom": "Open full-size image"
+    },
+    "details": {
+      "brand": "Brand",
+      "sku": "Product code: {{sku}}",
+      "rating": "{{rating}} out of 5 stars",
+      "reviewCount": "Read {{count}} reviews",
+      "price": "Price",
+      "taxIncluded": "Taxes included",
+      "color": "Choose a color",
+      "size": "Choose a size",
+      "quantity": "Quantity",
+      "sizeGuide": "Open size guide"
+    },
+    "availability": {
+      "inStock": "In stock and ready to ship",
+      "lowStock": "Only {{count}} left in stock",
+      "outOfStock": "Currently out of stock",
+      "preorder": "Preorder for delivery after {{date}}",
+      "notify": "Notify me when available"
+    },
+    "purchase": {
+      "addToCart": "Add to cart",
+      "buyNow": "Buy now",
+      "added": "Added to your cart",
+      "viewCart": "View cart",
+      "limitReached": "You have reached the purchase limit for this product"
+    },
+    "delivery": {
+      "title": "Delivery and pickup",
+      "postalCodeLabel": "Postal code",
+      "postalCodePlaceholder": "Enter your postal code",
+      "check": "Check availability",
+      "estimated": "Estimated delivery: {{date}}",
+      "pickup": "Free pickup from {{store}}",
+      "unavailable": "Delivery is not available for this postal code"
+    },
+    "information": {
+      "description": "Product description",
+      "features": "Key features",
+      "specifications": "Specifications",
+      "materials": "Materials and care",
+      "shipping": "Shipping and returns",
+      "warranty": "Warranty"
+    },
+    "reviews": {
+      "title": "Customer reviews",
+      "summary": "Based on {{count}} verified reviews",
+      "write": "Write a review",
+      "verified": "Verified purchase",
+      "helpful": "Was this review helpful?",
+      "report": "Report this review",
+      "empty": "Be the first to review this product"
+    }
+  }
+}
+

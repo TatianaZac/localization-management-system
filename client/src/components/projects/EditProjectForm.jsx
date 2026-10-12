@@ -26,12 +26,7 @@ function EditProjectForm({ isSaving, onCancel, onSave, project }) {
       </div>
       <label>
         Назва
-        <input
-          autoFocus
-          onChange={(event) => setName(event.target.value)}
-          required
-          value={name}
-        />
+        <input autoFocus onChange={(event) => setName(event.target.value)} required value={name} />
       </label>
       <label>
         Опис <span className="optional">необов’язково</span>

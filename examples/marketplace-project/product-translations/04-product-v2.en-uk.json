@@ -1,0 +1,132 @@
+{
+  "_localization": {
+    "sourceLocale": "en",
+    "targetLocale": "uk"
+  },
+  "source": {
+    "product": {
+      "gallery": {
+        "label": "Product gallery",
+        "previous": "Previous photo",
+        "next": "Next photo",
+        "thumbnail": "Open photo {{number}}",
+        "zoom": "View photo in full screen"
+      },
+      "details": {
+        "brand": "Manufacturer",
+        "sku": "Item number: {{sku}}",
+        "rating": "Rating: {{rating}} out of 5",
+        "reviewCount": "View {{count}} reviews",
+        "price": "Price",
+        "taxIncluded": "Price includes taxes",
+        "color": "Select a color",
+        "size": "Select a size",
+        "quantity": "Quantity",
+        "sizeGuide": "Size guide"
+      },
+      "availability": {
+        "inStock": "This item is in stock",
+        "lowStock": "Hurry, only {{count}} left",
+        "outOfStock": "Temporarily out of stock",
+        "preorder": "Available to preorder after {{date}}",
+        "notify": "Notify me about availability"
+      },
+      "purchase": {
+        "addToCart": "Add to basket",
+        "buyNow": "Purchase now",
+        "added": "Item added to your basket",
+        "viewCart": "Go to basket",
+        "limitReached": "Maximum quantity reached for this item"
+      },
+      "delivery": {
+        "title": "Order delivery",
+        "postalCodeLabel": "Your postal code",
+        "postalCodePlaceholder": "For example, 01001",
+        "check": "Check delivery",
+        "estimated": "Expected delivery date: {{date}}",
+        "pickup": "Collect free from {{store}}",
+        "unavailable": "Delivery is currently unavailable for this postal code"
+      },
+      "information": {
+        "description": "About this item",
+        "features": "Benefits",
+        "specifications": "Product details",
+        "materials": "Composition and care",
+        "shipping": "Delivery and return terms",
+        "warranty": "Warranty terms"
+      },
+      "reviews": {
+        "title": "Product reviews",
+        "summary": "{{count}} verified reviews",
+        "write": "Add a review",
+        "verified": "Purchase verified",
+        "helpful": "Helpful review?",
+        "report": "Report a problem",
+        "empty": "Be the first to leave a review"
+      }
+    }
+  },
+  "translation": {
+    "product": {
+      "gallery": {
+        "label": "Галерея товару",
+        "previous": "Попереднє фото",
+        "next": "Наступне фото",
+        "thumbnail": "Відкрити фото {{number}}",
+        "zoom": "Переглянути фото на весь екран"
+      },
+      "details": {
+        "brand": "Виробник",
+        "sku": "Артикул: {{sku}}",
+        "rating": "Оцінка: {{rating}} із 5",
+        "reviewCount": "Переглянути {{count}} відгуків",
+        "price": "Ціна",
+        "taxIncluded": "Ціну вказано з податками",
+        "color": "Виберіть колір",
+        "size": "Виберіть розмір",
+        "quantity": "Кількість",
+        "sizeGuide": "Таблиця розмірів"
+      },
+      "availability": {
+        "inStock": "Товар є в наявності",
+        "lowStock": "Поспішайте: залишилося {{count}} шт.",
+        "outOfStock": "Товар тимчасово відсутній",
+        "preorder": "Доступно для передзамовлення після {{date}}",
+        "notify": "Сповістити про наявність"
+      },
+      "purchase": {
+        "addToCart": "У кошик",
+        "buyNow": "Придбати зараз",
+        "added": "Товар додано до кошика",
+        "viewCart": "Перейти до кошика",
+        "limitReached": "Досягнуто максимальної кількості цього товару"
+      },
+      "delivery": {
+        "title": "Отримання замовлення",
+        "postalCodeLabel": "Ваш поштовий індекс",
+        "postalCodePlaceholder": "Наприклад, 01001",
+        "check": "Перевірити доставку",
+        "estimated": "Очікувана дата доставки: {{date}}",
+        "pickup": "Забрати безкоштовно з магазину {{store}}",
+        "unavailable": "Доставка за вказаним індексом поки недоступна"
+      },
+      "information": {
+        "description": "Про товар",
+        "features": "Переваги",
+        "specifications": "Характеристики",
+        "materials": "Склад і догляд",
+        "shipping": "Умови доставки та повернення",
+        "warranty": "Гарантійні умови"
+      },
+      "reviews": {
+        "title": "Відгуки про товар",
+        "summary": "{{count}} підтверджених відгуків",
+        "write": "Додати відгук",
+        "verified": "Покупку підтверджено",
+        "helpful": "Відгук корисний?",
+        "report": "Повідомити про порушення",
+        "empty": "Будьте першими, хто залишить відгук"
+      }
+    }
+  }
+}

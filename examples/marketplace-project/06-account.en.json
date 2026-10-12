@@ -1,0 +1,76 @@
+{
+  "account": {
+    "sidebar": {
+      "overview": "Account overview",
+      "profile": "Personal details",
+      "addresses": "Saved addresses",
+      "payments": "Payment methods",
+      "orders": "Order history",
+      "preferences": "Preferences",
+      "security": "Security"
+    },
+    "overview": {
+      "greeting": "Welcome back, {{name}}",
+      "description": "Manage your orders, details, and shopping preferences.",
+      "recentOrders": "Recent orders",
+      "viewAllOrders": "View all orders",
+      "noOrders": "You have not placed any orders yet"
+    },
+    "profile": {
+      "title": "Personal details",
+      "firstName": "First name",
+      "lastName": "Last name",
+      "email": "Email address",
+      "phone": "Phone number",
+      "birthday": "Date of birth",
+      "saved": "Your personal details have been updated"
+    },
+    "addresses": {
+      "title": "Saved addresses",
+      "add": "Add a new address",
+      "edit": "Edit address",
+      "delete": "Delete address",
+      "default": "Default address",
+      "makeDefault": "Set as default",
+      "deleteConfirm": "Remove this address from your account?",
+      "empty": "You do not have any saved addresses"
+    },
+    "orders": {
+      "title": "Order history",
+      "orderNumber": "Order {{number}}",
+      "placedOn": "Placed on {{date}}",
+      "status": {
+        "processing": "Processing",
+        "shipped": "Shipped",
+        "delivered": "Delivered",
+        "cancelled": "Cancelled",
+        "returned": "Returned"
+      },
+      "viewDetails": "View order details",
+      "track": "Track delivery",
+      "downloadInvoice": "Download invoice",
+      "buyAgain": "Buy these items again",
+      "requestReturn": "Request a return"
+    },
+    "security": {
+      "title": "Password and security",
+      "currentPassword": "Current password",
+      "newPassword": "New password",
+      "confirmPassword": "Confirm new password",
+      "passwordHint": "Use at least 12 characters with a number and a symbol",
+      "changePassword": "Change password",
+      "twoFactor": "Two-step verification",
+      "twoFactorDescription": "Add an extra layer of protection to your account",
+      "enableTwoFactor": "Enable two-step verification",
+      "sessions": "Active sessions",
+      "signOutAll": "Sign out on all other devices"
+    },
+    "preferences": {
+      "title": "Communication preferences",
+      "productNews": "Product news and recommendations",
+      "offers": "Offers and promotions",
+      "orderUpdates": "Order and delivery updates",
+      "saved": "Your communication preferences have been saved"
+    }
+  }
+}

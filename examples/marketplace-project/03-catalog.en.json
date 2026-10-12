@@ -1,0 +1,70 @@
+{
+  "catalog": {
+    "header": {
+      "title": "All products",
+      "description": "Discover products selected for quality, usefulness, and lasting design.",
+      "resultCount": "{{count}} products found"
+    },
+    "filters": {
+      "title": "Filters",
+      "open": "Show filters",
+      "close": "Hide filters",
+      "apply": "Apply filters",
+      "clearAll": "Clear all filters",
+      "activeCount": "{{count}} filters applied",
+      "groups": {
+        "category": "Category",
+        "brand": "Brand",
+        "price": "Price range",
+        "rating": "Customer rating",
+        "availability": "Availability",
+        "delivery": "Delivery options"
+      },
+      "availability": {
+        "inStock": "In stock",
+        "preorder": "Available for preorder",
+        "storePickup": "Available for store pickup"
+      },
+      "price": {
+        "minimum": "Minimum price",
+        "maximum": "Maximum price",
+        "invalidRange": "Enter a maximum price greater than the minimum price"
+      }
+    },
+    "sorting": {
+      "label": "Sort products",
+      "featured": "Featured",
+      "newest": "Newest first",
+      "priceLow": "Price: low to high",
+      "priceHigh": "Price: high to low",
+      "rating": "Highest rated"
+    },
+    "productCard": {
+      "new": "New",
+      "sale": "Sale",
+      "exclusive": "Member exclusive",
+      "rating": "Rated {{rating}} out of 5",
+      "reviewCount": "{{count}} reviews",
+      "originalPrice": "Original price: {{price}}",
+      "currentPrice": "Current price: {{price}}",
+      "addToCart": "Add to cart",
+      "quickView": "Quick view",
+      "addToWishlist": "Add to wishlist",
+      "removeFromWishlist": "Remove from wishlist",
+      "outOfStock": "Out of stock"
+    },
+    "empty": {
+      "title": "No matching products",
+      "description": "Try removing a filter or searching for something else.",
+      "reset": "Reset catalog"
+    },
+    "pagination": {
+      "label": "Catalog pages",
+      "previous": "Previous page",
+      "next": "Next page",
+      "page": "Page {{page}}",
+      "currentPage": "Page {{page}}, current page"
+    }
+  }
+}
+

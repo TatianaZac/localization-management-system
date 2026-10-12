@@ -16,7 +16,7 @@ function CreateProjectForm({ isSaving, onCreate }) {
     const wasCreated = await onCreate({
       name,
       description,
-      sourceLocale: { code: sourceCode, name: sourceName },
+      sourceLocale: { code: sourceCode, name: sourceName }
     })
 
     if (wasCreated) {

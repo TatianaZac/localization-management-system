@@ -1,11 +1,11 @@
 // Цей файл є точкою запуску HTTP-сервера та відкриває порт застосунку.
 
-require("dotenv").config();
+require('dotenv').config()
 
-const app = require("./app");
+const app = require('./app')
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5000
 
 app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
-});
+  console.log(`Server is running on http://localhost:${PORT}`)
+})

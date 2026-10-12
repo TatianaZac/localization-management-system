@@ -1,0 +1,51 @@
+{
+  "home": {
+    "hero": {
+      "eyebrow": "Fresh picks for every day",
+      "title": "Make room for something remarkable",
+      "description": "Explore thoughtful products from trusted brands and independent makers.",
+      "primaryAction": "Shop new arrivals",
+      "secondaryAction": "View weekly deals",
+      "imageAlt": "A selection of home, technology, and lifestyle products"
+    },
+    "benefits": {
+      "delivery": {
+        "title": "Fast delivery",
+        "description": "Track every order from our warehouse to your door."
+      },
+      "returns": {
+        "title": "Easy returns",
+        "description": "Return eligible items within 30 days of delivery."
+      },
+      "support": {
+        "title": "Real human support",
+        "description": "Our team is ready to help seven days a week."
+      }
+    },
+    "featured": {
+      "title": "Featured collections",
+      "subtitle": "Curated around the way you live",
+      "viewAll": "View all collections",
+      "card": {
+        "open": "Explore collection",
+        "items": "{{count}} products"
+      }
+    },
+    "recommendations": {
+      "title": "Recommended for you",
+      "subtitle": "Based on products you recently viewed",
+      "empty": "Browse the catalog to get personalized recommendations",
+      "dismiss": "Hide this recommendation"
+    },
+    "newsletter": {
+      "title": "A better inbox starts here",
+      "description": "Get product stories, useful guides, and member-only offers.",
+      "emailLabel": "Email address",
+      "emailPlaceholder": "you@example.com",
+      "submit": "Join the newsletter",
+      "success": "You're on the list. Check your inbox to confirm.",
+      "privacyHint": "You can unsubscribe at any time."
+    }
+  }
+}
+

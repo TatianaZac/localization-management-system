@@ -6,14 +6,18 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "format": "prettier --write \"src/**/*.{js,jsx,css}\" \"../server/{src,scripts,tests}/**/*.js\"",
+    "check:format": "prettier --check \"src/**/*.{js,jsx,css}\" \"../server/{src,scripts,tests}/**/*.js\"",
     "preview": "vite preview"
   },
   "dependencies": {
+    "lucide-react": "^1.52.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^6.0.4",
+    "prettier": "^3.6.2",
     "vite": "^8.2.0"
   }
 }

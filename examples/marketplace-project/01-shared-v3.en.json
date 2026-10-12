@@ -1,0 +1,72 @@
+{
+  "app": {
+    "name": "Northstar Market",
+    "tagline": "Thoughtful products for better everyday living"
+  },
+  "navigation": {
+    "primary": {
+      "home": "Home",
+      "catalog": "Catalog",
+      "deals": "Weekly deals",
+      "newArrivals": "Just arrived",
+      "giftCards": "Gift cards",
+      "support": "Support"
+    },
+    "account": {
+      "signIn": "Sign in or register",
+      "profile": "My profile",
+      "orders": "Orders and returns",
+      "notifications": "Notifications",
+      "signOut": "Sign out"
+    },
+    "accessibility": {
+      "openMenu": "Open navigation menu",
+      "closeMenu": "Close navigation menu",
+      "openSearch": "Open product search",
+      "closeSearch": "Close product search",
+      "skipToContent": "Skip to main content"
+    }
+  },
+  "search": {
+    "label": "Search the marketplace",
+    "placeholder": "Search products, categories, and brands",
+    "submit": "Show results",
+    "clear": "Clear search",
+    "suggestions": "Suggested searches",
+    "popular": "Popular searches",
+    "historyEmpty": "Your search history is empty"
+  },
+  "actions": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "continue": "Continue to the next step",
+    "back": "Go back",
+    "close": "Close",
+    "confirm": "Confirm selection",
+    "copy": "Copy",
+    "learnMore": "Learn more"
+  },
+  "status": {
+    "loading": "Loading…",
+    "saving": "Saving changes…",
+    "success": "Changes saved successfully",
+    "offline": "No internet connection. Check your network and try again.",
+    "sessionExpired": "Your session has expired. Please sign in again.",
+    "maintenance": "Northstar Market is temporarily unavailable for maintenance.",
+    "unexpectedError": "We could not complete your request. Please try again."
+  },
+  "footer": {
+    "company": {
+      "about": "About Northstar Market",
+      "careers": "Careers",
+      "sustainability": "Our sustainability commitments"
+    },
+    "legal": {
+      "privacy": "Privacy policy",
+      "terms": "Terms of service",
+      "cookies": "Cookie settings"
+    },
+    "copyright": "© {{year}} Northstar Market. All rights reserved worldwide."
+  }
+}
+
