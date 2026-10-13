@@ -118,7 +118,7 @@ model GlossaryConcept {
   project        Project         @relation(fields: [projectId], references: [id], onDelete: Cascade)
   entries        GlossaryEntry[]
 
-  @@unique([projectId, normalizedTerm])
+  @@index([projectId, normalizedTerm])
 }
 
 // Нова пропозиція не змінює чинну рекомендацію до погодження.

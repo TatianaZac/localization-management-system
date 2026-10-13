@@ -1,4 +1,4 @@
-import { CheckCircle2, EllipsisVertical } from 'lucide-react'
+import { AlertTriangle, CheckCircle2, EllipsisVertical, HelpCircle } from 'lucide-react'
 
 function StatusBadge({ status }) {
   if (!status) return null
@@ -21,6 +21,7 @@ export default function MergePresenceTable({ changes, incomingVersion, targetVer
         const source = isAdded ? change.incomingSource : change.targetSource
         const translation = isAdded ? change.incoming : change.target
         const status = isAdded ? change.incomingStatus : change.targetStatus
+        const terminology = isAdded ? change.incomingTerminology : change.targetTerminology
 
         return (
           <div className="merge-presence-table-row" role="row" key={change.id}>
@@ -40,6 +41,26 @@ export default function MergePresenceTable({ changes, incomingVersion, targetVer
             </div>
             <div className="merge-presence-status" data-label="Статус / Примітка" role="cell">
               <StatusBadge status={status} />
+              {terminology?.warnings.length > 0 && (
+                <span className="merge-presence-terminology conflict">
+                  <AlertTriangle size={17} />
+                  Не відповідає глосарію
+                </span>
+              )}
+              {terminology?.compliant && (
+                <span className="merge-presence-terminology compliant">
+                  <CheckCircle2 size={17} />
+                  Відповідає глосарію
+                </span>
+              )}
+              {terminology?.hasTerms &&
+                !terminology.compliant &&
+                terminology.warnings.length === 0 && (
+                  <span className="merge-presence-terminology ambiguous">
+                    <HelpCircle size={17} />
+                    Контекст неоднозначний
+                  </span>
+                )}
               {isAdded && (
                 <span>
                   <CheckCircle2 size={17} />

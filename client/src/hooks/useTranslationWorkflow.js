@@ -49,7 +49,7 @@ export default function useTranslationWorkflow({
             item.translations.some((translation) => translation.id === translationId)
           )?.key ?? ''
         setTerminologyWarning(
-          `«${key}»: переклад збережено, але не знайдено рекомендовані терміни: ${updated.terminologyWarnings.map((item) => `${item.term} → ${item.translation}`).join('; ')}.`
+          `«${key}»: переклад збережено. Можлива невідповідність глосарію: ${updated.terminologyWarnings.map((item) => `${item.term} → ${item.translation}`).join('; ')}.`
         )
       }
       return true

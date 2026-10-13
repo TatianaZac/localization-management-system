@@ -64,16 +64,97 @@
 }
 .glossary-form {
   display: grid;
-  gap: 14px;
+  gap: 18px;
   padding: 20px;
   margin-bottom: 20px;
   background: white;
   border: 1px solid #dfe4ec;
   border-radius: 8px;
 }
+.glossary-form-heading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 2px;
+}
+.glossary-form-heading-icon {
+  width: 42px;
+  height: 42px;
+  flex: 0 0 42px;
+  display: grid;
+  place-items: center;
+  border-radius: 10px;
+  background: #eaf3ff;
+  color: #1774e8;
+}
 .glossary-form h2 {
   margin: 0;
-  font-size: 17px;
+  color: #13203a;
+  font-size: 21px;
+  line-height: 1.2;
+}
+.glossary-form label {
+  gap: 8px;
+  color: #526b91;
+  font-size: 12px;
+  font-weight: 500;
+}
+.glossary-field-control {
+  position: relative;
+  display: block;
+  color: #7183a3;
+}
+.glossary-field-control .glossary-field-icon {
+  position: absolute;
+  z-index: 1;
+  top: 50%;
+  left: 14px;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+.glossary-field-control.multiline .glossary-field-icon {
+  top: 16px;
+  transform: none;
+}
+.glossary-page .glossary-field-control input,
+.glossary-page .glossary-field-control select,
+.glossary-page .glossary-field-control textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px 14px 12px 45px;
+  border-color: #cbd7e7;
+  border-radius: 8px;
+  color: #17243a;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  font-size: 13px;
+  font-style: normal;
+  font-variant: normal;
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 19px;
+  text-rendering: geometricPrecision;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+.glossary-page .glossary-field-control input,
+.glossary-page .glossary-field-control select {
+  min-height: 46px;
+}
+.glossary-page .glossary-field-control textarea {
+  min-height: 74px;
+  line-height: 19px;
+  white-space: pre-wrap;
+}
+.glossary-page .glossary-field-control input::placeholder,
+.glossary-page .glossary-field-control textarea::placeholder {
+  color: #8391ab;
+}
+.glossary-page .glossary-field-control input:disabled,
+.glossary-page .glossary-field-control select:disabled,
+.glossary-page .glossary-field-control textarea:disabled {
+  opacity: 1;
+  background: #f8fafc;
+  color: #17243a;
 }
 .glossary-buttons {
   display: flex;
@@ -81,11 +162,37 @@
   gap: 8px;
   align-items: center;
 }
+.glossary-form > .glossary-buttons {
+  gap: 10px;
+  padding-top: 16px;
+  border-top: 1px solid #e1e8f1;
+}
 .glossary-buttons button {
   border: 1px solid #d8dee8;
   border-radius: 5px;
   padding: 7px 9px;
   cursor: pointer;
+}
+.glossary-form > .glossary-buttons .button {
+  min-height: 45px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  padding: 10px 14px;
+  font-size: 14px;
+}
+.glossary-form > .glossary-buttons .primary {
+  flex: 1 1 205px;
+  border-color: transparent;
+  background: #1677f2;
+  box-shadow: 0 5px 12px rgb(22 119 242 / 18%);
+  color: white;
+}
+.glossary-form > .glossary-buttons .secondary {
+  flex: 0 1 auto;
+  background: #eef3f9;
+  color: #173f78;
 }
 .glossary-buttons button:disabled {
   opacity: 0.5;
@@ -153,6 +260,152 @@
 }
 .glossary-suggestions button {
   margin-top: 10px;
+}
+.glossary-suggestions .glossary-section-toggle {
+  width: 100%;
+  min-height: 48px;
+  display: grid;
+  grid-template-columns: 30px minmax(0, 1fr) 16px;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  padding: 7px 13px;
+  border: 0;
+  outline: none;
+  color: #17243a;
+  background: white;
+  box-shadow: none;
+  text-align: left;
+}
+.glossary-suggestions .glossary-section-toggle:focus {
+  outline: none;
+}
+.glossary-suggestions .glossary-section-toggle:focus-visible {
+  border-radius: 9px;
+  box-shadow: inset 0 0 0 2px rgb(36 123 243 / 22%);
+}
+.glossary-title-icon {
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  border-radius: 7px;
+  background: #edf5ff;
+}
+.glossary-title-icon .detail-card-icon {
+  width: 18px;
+  height: 18px;
+}
+.glossary-section-toggle > strong {
+  font-size: 14px;
+}
+.glossary-toggle-chevron {
+  color: #69809d;
+  transition: transform 150ms ease;
+}
+.glossary-suggestions.collapsed .glossary-toggle-chevron {
+  transform: rotate(180deg);
+}
+.glossary-suggestions .glossary-match-list {
+  gap: 0;
+  margin: 0;
+}
+.glossary-suggestions .glossary-match {
+  display: grid;
+  gap: 7px;
+  padding: 10px 0 12px;
+  background: transparent;
+}
+.glossary-suggestions .glossary-match:first-child {
+  padding-top: 2px;
+}
+.glossary-suggestions .glossary-match + .glossary-match {
+  border-top: 1px solid #e6ebf2;
+}
+.glossary-match-term {
+  color: #183354;
+  line-height: 1.3;
+}
+.key-details section .glossary-ambiguity-note {
+  display: grid;
+  grid-template-columns: 18px minmax(0, 1fr);
+  align-items: start;
+  gap: 8px;
+  margin: 0;
+  padding: 9px 10px;
+  border: 1px solid #f7dfb6;
+  border-radius: 7px;
+  color: #6f5a35;
+  background: #fff8eb;
+  font-size: 11px;
+  line-height: 1.45;
+}
+.glossary-ambiguity-note svg {
+  margin-top: 1px;
+  color: #e28a16;
+}
+.glossary-ambiguity-note strong {
+  color: #253b57;
+  font-size: inherit;
+}
+.glossary-match-options {
+  display: grid;
+  gap: 7px;
+}
+.glossary-suggestions .glossary-match-option {
+  display: grid;
+  gap: 3px;
+  width: 100%;
+  margin: 0;
+  padding: 9px 10px;
+  border: 1px solid #d8e0eb;
+  border-radius: 7px;
+  color: #61728a;
+  background: #f7f9fc;
+  font-size: 11px;
+  line-height: 1.35;
+  text-align: left;
+}
+.glossary-suggestions .glossary-match-option.recommended {
+  border-color: #4c8df6;
+  box-shadow: 0 0 0 1px #e4efff;
+  background: #f5f9ff;
+}
+.glossary-match-option-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.glossary-match-option-heading small {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 3px 7px;
+  border-radius: 999px;
+  color: #327354;
+  background: #e3f6ec;
+  font-size: 10px;
+  white-space: nowrap;
+}
+.glossary-match-option:not(.recommended) .glossary-match-option-heading small {
+  color: #64748b;
+  background: #e9eef5;
+}
+.glossary-match-definition {
+  color: #61728a;
+}
+.glossary-match-context {
+  display: grid;
+  gap: 1px;
+  margin-top: 5px;
+  padding-top: 6px;
+  border-top: 1px solid #e5eaf1;
+  color: #536780;
+}
+.glossary-context-label {
+  color: #8090a5;
+  font-size: 10px;
 }
 .glossary-workarea {
   display: grid;
@@ -303,6 +556,146 @@
 .glossary-term {
   color: #3156c8;
   font-weight: 600;
+}
+.glossary-more-meanings {
+  display: inline-block;
+  margin-left: 7px;
+  padding: 2px 7px;
+  border-radius: 99px;
+  background: #e7f0ff;
+  color: #1767c7;
+  font-size: 11px;
+  font-weight: 700;
+}
+.glossary-section-heading,
+.glossary-meaning-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.glossary-section-heading h3 {
+  margin: 0;
+}
+.glossary-details .glossary-add-meaning {
+  border-color: transparent;
+  background: #eef5ff;
+  color: #1767c7;
+  font-weight: 700;
+}
+.glossary-meaning-list {
+  display: grid;
+  gap: 12px;
+  margin-top: 14px;
+}
+.glossary-meaning-card {
+  padding: 13px;
+  border: 1px solid #dce4ef;
+  border-radius: 9px;
+  background: #fff;
+}
+.glossary-meaning-card.selected {
+  border-color: #78aef6;
+  box-shadow: 0 0 0 2px rgb(40 127 238 / 10%);
+}
+.glossary-meaning-number {
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #e7f0ff;
+  color: #1767c7;
+  font-weight: 800;
+}
+.glossary-meaning-title {
+  color: #344b68;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.glossary-meaning-heading {
+  min-height: 30px;
+  cursor: pointer;
+}
+.glossary-meaning-actions {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: auto;
+}
+.glossary-details .glossary-meaning-actions button {
+  min-width: 28px;
+  padding: 4px 7px;
+  border-color: transparent;
+  background: transparent;
+  color: #49647f;
+  font-size: 18px;
+  line-height: 1;
+}
+.glossary-details .glossary-meaning-actions button:hover {
+  background: #eef5ff;
+  color: #1767c7;
+}
+.glossary-meaning-menu {
+  position: relative;
+}
+.glossary-meaning-menu-popover {
+  position: absolute;
+  z-index: 4;
+  top: 32px;
+  right: 0;
+  width: 132px;
+  display: grid;
+  padding: 5px;
+  border: 1px solid #dce4ef;
+  border-radius: 7px;
+  background: white;
+  box-shadow: 0 8px 24px rgb(32 41 57 / 16%);
+}
+.glossary-details .glossary-meaning-menu-popover button {
+  width: 100%;
+  padding: 8px 9px;
+  text-align: left;
+  font-size: 12px;
+}
+.glossary-details .glossary-meaning-menu-popover .delete {
+  color: #d92d20;
+}
+.glossary-details .glossary-meaning-toggle {
+  font-size: 15px;
+}
+.glossary-meaning-fields {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+}
+.glossary-meaning-fields > div {
+  display: grid;
+  gap: 4px;
+}
+.glossary-meaning-fields dd {
+  padding: 9px 10px;
+  border: 1px solid #dce4ef;
+  border-radius: 6px;
+  background: #f8fafc;
+  font-size: 12px;
+  white-space: pre-wrap;
+}
+.glossary-meaning-fields .glossary-meaning-metadata {
+  margin-top: 2px;
+  padding-top: 10px;
+  border-top: 1px solid #e2e8f0;
+}
+.glossary-meaning-fields .glossary-meaning-metadata dd {
+  display: grid;
+  gap: 4px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #64748b;
+  font-size: 11px;
 }
 .glossary-translation-section > h3:first-child {
   color: #1767c7;

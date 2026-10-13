@@ -1,3 +1,5 @@
+import { matchesGlossaryTerm, rankGlossaryMatches } from './glossary.js'
+
 function getTranslation(translationKey, localeCode) {
   return translationKey?.translations.find((translation) => translation.locale.code === localeCode)
 }
@@ -18,7 +20,39 @@ function getCurrentSource(translationKey) {
   )
 }
 
-export function buildMergeComparison(targetProject, incomingProject, localeCode) {
+function analyzeTerminology(source, value, glossary, localeCode) {
+  const matches = rankGlossaryMatches(
+    source,
+    glossary.filter((entry) => entry.status === 'APPROVED' && entry.locale?.code === localeCode)
+  )
+  const warnings = matches
+    .filter(
+      (match) =>
+        match.recommended && !matchesGlossaryTerm(value ?? '', match.recommended.translation)
+    )
+    .map((match) => ({
+      term: match.term,
+      translation: match.recommended.translation,
+      occurrenceNumber: match.occurrenceNumber,
+      occurrenceCount: match.occurrenceCount
+    }))
+  const uniqueWarnings = [
+    ...new Map(
+      warnings.map((warning) => [`${warning.term}\u0000${warning.translation}`, warning])
+    ).values()
+  ]
+  const checkedCount = matches.filter((match) => match.recommended).length
+
+  return {
+    hasTerms: matches.length > 0,
+    checkedCount,
+    ambiguousCount: matches.length - checkedCount,
+    compliant: checkedCount > 0 && uniqueWarnings.length === 0,
+    warnings: uniqueWarnings
+  }
+}
+
+export function buildMergeComparison(targetProject, incomingProject, localeCode, glossary = []) {
   const targetKeys = new Map(
     (targetProject.translationKeys ?? []).map((translationKey) => [
       translationKey.key,
@@ -48,6 +82,16 @@ export function buildMergeComparison(targetProject, incomingProject, localeCode)
     const removed = Boolean(targetKey) && !incomingKey
     const sourceChanged = Boolean(targetKey && incomingKey && targetSource !== incomingSource)
     const translationChanged = Boolean(targetKey && incomingKey && targetValue !== incomingValue)
+    const targetTerminology = analyzeTerminology(targetSource, targetValue, glossary, localeCode)
+    const incomingTerminology = analyzeTerminology(
+      incomingSource,
+      incomingValue,
+      glossary,
+      localeCode
+    )
+    const terminologyConflict = Boolean(
+      targetTerminology.warnings.length || incomingTerminology.warnings.length
+    )
 
     return {
       id: key,
@@ -60,7 +104,14 @@ export function buildMergeComparison(targetProject, incomingProject, localeCode)
       removed,
       sourceChanged,
       translationChanged,
-      unchanged: Boolean(targetKey && incomingKey) && !sourceChanged && !translationChanged,
+      terminologyConflict,
+      targetTerminology,
+      incomingTerminology,
+      unchanged:
+        Boolean(targetKey && incomingKey) &&
+        !sourceChanged &&
+        !translationChanged &&
+        !terminologyConflict,
       targetStatus: targetTranslation?.status ?? 'NEW',
       incomingStatus: incomingTranslation?.status ?? 'NEW',
       targetAuthor: getTranslationAuthor(targetTranslation),

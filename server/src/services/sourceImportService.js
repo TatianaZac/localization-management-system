@@ -1,4 +1,4 @@
-// Кожний імпорт створює незалежний знімок сторінки, не переписуючи старі ключі.
+// Кожний імпорт створює окремий набір ключів сторінки; переклади версій редагуються незалежно.
 const prisma = require('../prisma')
 const { parseLocalizationImport } = require('../utils/parseLocalizationImport')
 

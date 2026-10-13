@@ -2,16 +2,19 @@
 
 import { useEffect, useState } from 'react'
 import GlossaryProposal from '../projects/GlossaryProposal'
-import { matchesGlossaryTerm } from '../../utils/glossary'
+import { matchesGlossaryTerm, rankGlossaryMatches } from '../../utils/glossary'
 import {
   BookOpen,
   Check,
+  CheckCircle2,
+  ChevronUp,
+  CirclePlus,
   CircleCheckBig,
   Clock3,
   History,
+  Info,
   Lightbulb,
   MessageSquare,
-  Plus,
   Undo2,
   UsersRound
 } from 'lucide-react'
@@ -86,6 +89,7 @@ export default function KeyDetailsPanel({
 }) {
   const versions = selectedTranslation?.versions ?? []
   const [reviewVersionNumber, setReviewVersionNumber] = useState(null)
+  const [isGlossaryOpen, setIsGlossaryOpen] = useState(true)
 
   useEffect(() => {
     setReviewVersionNumber(selectedTranslation?.currentVersion ?? versions[0]?.number ?? null)
@@ -99,13 +103,24 @@ export default function KeyDetailsPanel({
     )
   }
 
-  const glossaryMatches = glossary.filter(
-    (entry) =>
-      entry.status === 'APPROVED' &&
-      entry.locale.code === selectedLocaleCode &&
-      (matchesGlossaryTerm(selectedKey.sourceTexts[0]?.value, entry.term) ||
-        matchesGlossaryTerm(selectedKey.key, entry.term))
-  )
+  const glossaryMatches = rankGlossaryMatches(
+    selectedKey.sourceTexts[0]?.value,
+    glossary.filter((entry) => entry.locale.code === selectedLocaleCode)
+  ).map((match) => {
+    if (match.recommended) return match
+
+    const usedCandidates = match.candidates.filter(({ entry }) =>
+      matchesGlossaryTerm(selectedTranslation?.value, entry.translation)
+    )
+    const used = usedCandidates.length === 1 ? usedCandidates[0].entry : null
+
+    return {
+      ...match,
+      ambiguous: !used,
+      recommended: used,
+      resolvedFromTranslation: Boolean(used)
+    }
+  })
   const reviewVersion = versions.find((version) => version.number === reviewVersionNumber)
   const currentSourceVersion = selectedKey.sourceTexts[0]?.version
   const reviewVersionIsOutdated =
@@ -189,56 +204,112 @@ export default function KeyDetailsPanel({
           <p>{selectedTranslation.reviewReason}</p>
         </section>
       )}
-      <section className="detail-card glossary-suggestions">
-        <DetailCardTitle icon="glossary">Глосарій</DetailCardTitle>
-        <div className="detail-card-body">
-          {glossaryError ? (
-            <p>{glossaryError}</p>
-          ) : glossaryMatches.length ? (
-            <ul>
-              {glossaryMatches.map((entry) => (
-                <li key={entry.id}>
-                  <strong>
-                    {entry.term} → {entry.translation}
-                  </strong>
-                  {entry.definition && <p>{entry.definition}</p>}
-                  {entry.example && <p>{entry.example}</p>}
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p>Для цього рядка термінів немає.</p>
-          )}
-          <div className="glossary-panel-actions">
-            <button className="button secondary" onClick={onGlossary} type="button">
-              <BookOpen aria-hidden="true" size={16} strokeWidth={1.8} />
-              Відкрити глосарій
-            </button>
-            <button
-              className="button secondary"
-              disabled={!selectedLocaleCode || Boolean(quickProposal)}
-              onClick={() =>
-                onStartProposal({
-                  localeCode: selectedLocaleCode,
-                  example: selectedKey.sourceTexts[0]?.value ?? ''
-                })
-              }
-              type="button"
-            >
-              <Plus aria-hidden="true" size={17} strokeWidth={1.8} />
-              {canReviewTranslations ? 'Додати термін' : 'Запропонувати термін'}
-            </button>
+      <section className={`detail-card glossary-suggestions${isGlossaryOpen ? '' : ' collapsed'}`}>
+        <button
+          aria-expanded={isGlossaryOpen}
+          className="glossary-section-toggle"
+          onClick={() => setIsGlossaryOpen((current) => !current)}
+          type="button"
+        >
+          <span className="glossary-title-icon">
+            <PanelIcon name="glossary" />
+          </span>
+          <strong>Глосарій</strong>
+          <ChevronUp aria-hidden="true" className="glossary-toggle-chevron" size={16} />
+        </button>
+        {isGlossaryOpen && (
+          <div className="detail-card-body">
+            {glossaryError ? (
+              <p>{glossaryError}</p>
+            ) : glossaryMatches.length ? (
+              <ul className="glossary-match-list">
+                {glossaryMatches.map((match) => (
+                  <li className="glossary-match" key={match.key}>
+                    <strong className="glossary-match-term">
+                      {match.term}
+                      {match.occurrenceCount > 1 &&
+                        ` · входження ${match.occurrenceNumber}/${match.occurrenceCount}`}
+                    </strong>
+                    {match.ambiguous && (
+                      <p className="glossary-ambiguity-note">
+                        <Info aria-hidden="true" size={16} />
+                        <span>
+                          <strong>Неоднозначний термін:</strong> недостатньо контексту для однієї
+                          рекомендації.
+                        </span>
+                      </p>
+                    )}
+                    <div className="glossary-match-options">
+                      {match.candidates.map(({ entry }) => {
+                        const isRecommended = match.recommended?.conceptId === entry.conceptId
+                        const label = isRecommended
+                          ? match.resolvedFromTranslation
+                            ? 'Використано в перекладі'
+                            : 'Рекомендовано'
+                          : 'Можливе значення'
+
+                        return (
+                          <div
+                            className={`glossary-match-option${isRecommended ? ' recommended' : ''}`}
+                            key={entry.id}
+                          >
+                            <span className="glossary-match-option-heading">
+                              <strong>{entry.translation}</strong>
+                              <small>
+                                {isRecommended && <CheckCircle2 aria-hidden="true" size={12} />}
+                                {label}
+                              </small>
+                            </span>
+                            {entry.definition && (
+                              <span className="glossary-match-definition">{entry.definition}</span>
+                            )}
+                            {entry.example && (
+                              <span className="glossary-match-context">
+                                <span className="glossary-context-label">Контекст:</span>
+                                <span>{entry.example}</span>
+                              </span>
+                            )}
+                          </div>
+                        )
+                      })}
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p>Для цього рядка термінів немає.</p>
+            )}
+            <div className="glossary-panel-actions">
+              <button className="button secondary" onClick={onGlossary} type="button">
+                <BookOpen aria-hidden="true" size={16} strokeWidth={1.8} />
+                Відкрити глосарій
+              </button>
+              <button
+                className="button secondary"
+                disabled={!selectedLocaleCode || Boolean(quickProposal)}
+                onClick={() =>
+                  onStartProposal({
+                    localeCode: selectedLocaleCode,
+                    example: selectedKey.sourceTexts[0]?.value ?? ''
+                  })
+                }
+                type="button"
+              >
+                <CirclePlus aria-hidden="true" size={17} strokeWidth={1.8} />
+                {canReviewTranslations ? 'Додати термін' : 'Запропонувати термін'}
+              </button>
+            </div>
+            {quickProposal && (
+              <GlossaryProposal
+                projectId={projectId}
+                {...quickProposal}
+                isReviewer={canReviewTranslations}
+                onClose={onProposalClose}
+                onSaved={onProposalSaved}
+              />
+            )}
           </div>
-          {quickProposal && (
-            <GlossaryProposal
-              projectId={projectId}
-              {...quickProposal}
-              isReviewer={canReviewTranslations}
-              onClose={onProposalClose}
-              onSaved={onProposalSaved}
-            />
-          )}
-        </div>
+        )}
       </section>
       <section className="detail-card version-summary">
         <DetailCardTitle icon="current">Актуальність</DetailCardTitle>

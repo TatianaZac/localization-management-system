@@ -1,5 +1,6 @@
 export const MERGE_FILTERS = [
   { value: 'all', label: 'Усі зміни' },
+  { value: 'terminology', label: 'Термінологічні конфлікти' },
   { value: 'translation', label: 'Відмінності перекладів' },
   { value: 'source', label: 'Змінені оригінали' },
   { value: 'added', label: 'Додані' },
@@ -17,6 +18,12 @@ export const MERGE_GROUPS = {
   translation: {
     title: 'Відмінності перекладів',
     description: 'Порівняй переклади у двох версіях і вибери потрібний варіант.',
+    tone: 'danger'
+  },
+  terminology: {
+    title: 'Термінологічні конфлікти',
+    description:
+      'Варіанти, у яких контекстний контроль не знайшов рекомендований відповідник із глосарія.',
     tone: 'danger'
   },
   source: {
@@ -198,7 +205,8 @@ export const MERGE_PREVIEW = [
 ]
 
 export function matchesMergeFilter(change, filter) {
-  if (filter === 'all') return !change.unchanged
+  if (filter === 'all') return !change.unchanged || change.terminologyConflict
+  if (filter === 'terminology') return change.terminologyConflict
   if (filter === 'translation') return change.translationChanged
   if (filter === 'source') return change.sourceChanged
   return Boolean(change[filter])

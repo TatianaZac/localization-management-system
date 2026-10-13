@@ -80,16 +80,10 @@ async function saveGlossaryEntry(req, res, next) {
         ? await tx.glossaryConcept.findFirst({
             where: { id: conceptId, projectId }
           })
-        : await tx.glossaryConcept.findUnique({
-            where: {
-              projectId_normalizedTerm: {
-                projectId,
-                normalizedTerm: term.toLowerCase()
-              }
-            }
-          })
+        : null
       if (conceptId && !concept) return null
-      // Пропозиція не перезаписує спільне визначення вже наявного поняття.
+      // Однаково написаний термін може позначати кілька понять. Без явного
+      // conceptId завжди створюємо нове поняття, а не вгадуємо його за назвою.
       if (!concept)
         concept = await tx.glossaryConcept.create({
           data: {

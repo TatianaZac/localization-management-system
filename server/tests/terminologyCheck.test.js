@@ -39,6 +39,130 @@ test('перевірка повертає рекомендацію лише за
       'Додати нову адресу',
       'account.addresses.add'
     ),
-    [{ term: 'account', translation: 'обліковий запис' }]
+    []
   )
+})
+
+test('контекст обирає значення лише за достатнього відриву', async () => {
+  const entries = [
+    {
+      id: 1,
+      conceptId: 10,
+      concept: { term: 'order' },
+      translation: 'замовлення',
+      example: 'Your order has been shipped'
+    },
+    {
+      id: 2,
+      conceptId: 20,
+      concept: { term: 'order' },
+      translation: 'порядок',
+      example: 'Put items in the correct order'
+    }
+  ]
+  const db = { glossaryEntry: { findMany: async () => entries } }
+
+  assert.deepEqual(await checkTerminology(db, 1, 2, 'Your order has been shipped', 'Ваш порядок'), [
+    { term: 'order', translation: 'замовлення' }
+  ])
+  assert.deepEqual(await checkTerminology(db, 1, 2, 'The order was shipped', 'Ваш порядок'), [
+    { term: 'order', translation: 'замовлення' }
+  ])
+  assert.deepEqual(await checkTerminology(db, 1, 2, 'Check the order', 'Перевірте'), [])
+})
+
+test('кожен контекст з нового рядка порівнюється окремо', async () => {
+  const entries = [
+    {
+      id: 1,
+      conceptId: 10,
+      concept: { term: 'item' },
+      translation: 'товар',
+      example: 'This item is out of stock.\nAbout this item'
+    },
+    {
+      id: 2,
+      conceptId: 20,
+      concept: { term: 'item' },
+      translation: 'елемент',
+      example: 'Select an item from the list.'
+    }
+  ]
+  const db = { glossaryEntry: { findMany: async () => entries } }
+
+  assert.deepEqual(await checkTerminology(db, 1, 2, 'About this item', 'Про елемент'), [
+    { term: 'item', translation: 'товар' }
+  ])
+  assert.deepEqual(await checkTerminology(db, 1, 2, 'About this item', 'Про товар'), [])
+})
+
+test('повторні входження одного терміна оцінюються за власним контекстом', async () => {
+  const entries = [
+    {
+      id: 1,
+      conceptId: 10,
+      concept: { term: 'order' },
+      translation: 'упорядкуйте',
+      example: 'Order the items alphabetically'
+    },
+    {
+      id: 2,
+      conceptId: 20,
+      concept: { term: 'order' },
+      translation: 'порядок',
+      example: 'Use the order shown'
+    }
+  ]
+  const db = { glossaryEntry: { findMany: async () => entries } }
+
+  assert.deepEqual(
+    await checkTerminology(
+      db,
+      1,
+      2,
+      'Order the items in the order shown',
+      'Розмістіть елементи довільно'
+    ),
+    [
+      { term: 'order', translation: 'упорядкуйте' },
+      { term: 'order', translation: 'порядок' }
+    ]
+  )
+  assert.deepEqual(
+    await checkTerminology(
+      db,
+      1,
+      2,
+      'Order the items in the order shown',
+      'Упорядкуйте елементи: порядок показано'
+    ),
+    []
+  )
+})
+
+test('довше словосполучення не дублюється вкладеним коротким терміном', async () => {
+  const db = {
+    glossaryEntry: {
+      findMany: async () => [
+        {
+          id: 1,
+          conceptId: 10,
+          concept: { term: 'purchase order' },
+          translation: 'замовлення на закупівлю',
+          example: ''
+        },
+        {
+          id: 2,
+          conceptId: 20,
+          concept: { term: 'order' },
+          translation: 'замовлення',
+          example: ''
+        }
+      ]
+    }
+  }
+
+  assert.deepEqual(await checkTerminology(db, 1, 2, 'Create a purchase order', 'Створити'), [
+    { term: 'purchase order', translation: 'замовлення на закупівлю' }
+  ])
 })

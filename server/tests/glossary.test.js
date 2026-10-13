@@ -226,6 +226,20 @@ test('цикл глосарію, права, інші мови та межі п�
         const listed = await call(controller.getGlossary, project.id, 'EDITOR', {})
         assert.equal(listed.result.length, 3)
         assert.ok(listed.result.every((item) => item.definition === 'Спільне значення'))
+        const secondMeaning = await call(controller.saveGlossaryEntry, project.id, 'REVIEWER', {
+          ...body,
+          translation: 'Увійти в систему фізично',
+          definition: 'Фізично зайти до приміщення',
+          example: 'Sign in at the front desk'
+        })
+        assert.equal(secondMeaning.code, 201)
+        assert.notEqual(secondMeaning.result.conceptId, entry.conceptId)
+        assert.equal(
+          await tx.glossaryConcept.count({
+            where: { projectId: project.id, normalizedTerm: 'sign in' }
+          }),
+          2
+        )
         const archived = await call(
           controller.reviewGlossaryEntry,
           project.id,
@@ -296,11 +310,88 @@ test('цикл глосарію, права, інші мови та межі п�
 })
 
 test('зіставлення термінів враховує регістр, Unicode і межі слів', async () => {
-  const { matchesGlossaryTerm: matches } = await import('../../client/src/utils/glossary.js')
+  const { matchesGlossaryTerm: matches, rankGlossaryMatches } = await import(
+    '../../client/src/utils/glossary.js'
+  )
   assert.equal(matches('Please SIGN IN now.', 'Sign in'), true)
   assert.equal(matches('category', 'cat'), false)
   assert.equal(matches('Увійти зараз', 'увійти'), true)
   assert.equal(matches('Вхідний', 'вхід'), false)
   assert.equal(matches('Use C++ here', 'C++'), true)
   assert.equal(matches('account.addresses.add', 'Account'), true)
+
+  const entries = [
+    {
+      id: 1,
+      conceptId: 10,
+      status: 'APPROVED',
+      term: 'order',
+      translation: 'замовлення',
+      example: 'Your order has been shipped'
+    },
+    {
+      id: 2,
+      conceptId: 20,
+      status: 'APPROVED',
+      term: 'order',
+      translation: 'порядок',
+      example: 'Put items in the correct order'
+    }
+  ]
+  const recommended = rankGlossaryMatches('The order was shipped', entries)
+  assert.equal(recommended[0].recommended.translation, 'замовлення')
+  assert.equal(recommended[0].ambiguous, false)
+  const ambiguous = rankGlossaryMatches('Check the order', entries)
+  assert.equal(ambiguous[0].recommended, null)
+  assert.equal(ambiguous[0].ambiguous, true)
+
+  const repeated = rankGlossaryMatches('Order the items in the order shown', [
+    {
+      ...entries[0],
+      translation: 'упорядкуйте',
+      example: 'Order the items alphabetically'
+    },
+    {
+      ...entries[1],
+      translation: 'порядок',
+      example: 'Use the order shown'
+    }
+  ])
+  assert.equal(repeated.length, 2)
+  assert.equal(repeated[0].recommended.translation, 'упорядкуйте')
+  assert.equal(repeated[1].recommended.translation, 'порядок')
+  assert.deepEqual(
+    repeated.map((match) => [match.occurrenceNumber, match.occurrenceCount]),
+    [
+      [1, 2],
+      [2, 2]
+    ]
+  )
+
+  const { buildMergeComparison } = await import('../../client/src/utils/mergeComparison.js')
+  const projectVersion = (translation) => ({
+    translationKeys: [
+      {
+        key: 'checkout.order',
+        sourceTexts: [{ value: 'Your order was shipped', isCurrent: true }],
+        translations: [
+          {
+            locale: { code: 'uk' },
+            value: translation,
+            status: 'TRANSLATED',
+            versions: []
+          }
+        ]
+      }
+    ]
+  })
+  const comparison = buildMergeComparison(
+    projectVersion('Ваше замовлення відправлено'),
+    projectVersion('Ваш порядок відправлено'),
+    'uk',
+    entries.map((entry) => ({ ...entry, locale: { code: 'uk' } }))
+  )
+  assert.equal(comparison[0].targetTerminology.compliant, true)
+  assert.equal(comparison[0].incomingTerminology.warnings[0].translation, 'замовлення')
+  assert.equal(comparison[0].terminologyConflict, true)
 })

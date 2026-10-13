@@ -33,16 +33,16 @@ function GlossaryTable({
               <th>Термін ({sourceLocaleCode.toUpperCase()})</th>
               <th>Переклад ({localeCode.toUpperCase()})</th>
               <th>Статус</th>
-              <th>Значення / контекст</th>
+              <th>Значення</th>
               <th>Оновлено</th>
             </tr>
           </thead>
           <tbody>
             {entries.map((entry) => (
               <tr
-                aria-selected={selectedId === entry.id}
-                className={selectedId === entry.id ? 'glossary-selected' : ''}
-                key={entry.id}
+                aria-selected={entry.entryIds?.includes(selectedId)}
+                className={entry.entryIds?.includes(selectedId) ? 'glossary-selected' : ''}
+                key={entry.concept.normalizedTerm}
                 onClick={() => onSelect(entry)}
                 onKeyDown={(event) => {
                   if (event.key === 'Enter' || event.key === ' ') {
@@ -55,7 +55,12 @@ function GlossaryTable({
                 <td>
                   <span className="glossary-term">{entry.term}</span>
                 </td>
-                <td>{entry.translation}</td>
+                <td>
+                  {entry.translation}
+                  {entry.additionalMeaningCount > 0 && (
+                    <span className="glossary-more-meanings">+{entry.additionalMeaningCount}</span>
+                  )}
+                </td>
                 <td>
                   <span className={'glossary-status ' + entry.status.toLowerCase()}>
                     {GLOSSARY_STATUS_LABELS[entry.status]}

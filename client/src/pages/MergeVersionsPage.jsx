@@ -1,6 +1,6 @@
 import { ArrowLeft, GitMerge, Search } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { getProject, mergePageVersions } from '../api/localizationApi'
+import { getGlossary, getProject, mergePageVersions } from '../api/localizationApi'
 import MergeChangeGroup from '../components/merge/MergeChangeGroup'
 import MergeFilters from '../components/merge/MergeFilters'
 import MergeVersionPicker from '../components/merge/MergeVersionPicker'
@@ -107,12 +107,18 @@ export default function MergeVersionsPage({
     setIsComparing(true)
     setComparisonError('')
     try {
-      const [targetProject, incomingProject] = await Promise.all([
+      const [targetProject, incomingProject, glossary] = await Promise.all([
         getProject(projectId, { pageId: currentPage.id, versionId: targetVersion }),
-        getProject(projectId, { pageId: currentPage.id, versionId: incomingVersion })
+        getProject(projectId, { pageId: currentPage.id, versionId: incomingVersion }),
+        getGlossary(projectId)
       ])
       if (sequence !== comparisonSequence.current) return
-      const nextComparison = buildMergeComparison(targetProject, incomingProject, locale.code)
+      const nextComparison = buildMergeComparison(
+        targetProject,
+        incomingProject,
+        locale.code,
+        glossary
+      )
       setComparison(nextComparison)
       setDecisions(defaultDecisions(nextComparison))
     } catch (requestError) {
@@ -155,7 +161,9 @@ export default function MergeVersionsPage({
     })
 
     const groupTypes =
-      activeFilter === 'all' ? ['translation', 'source', 'added', 'removed'] : [activeFilter]
+      activeFilter === 'all'
+        ? ['terminology', 'translation', 'source', 'added', 'removed']
+        : [activeFilter]
 
     return groupTypes
       .map((groupType) => ({

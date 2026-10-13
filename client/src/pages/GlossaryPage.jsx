@@ -5,7 +5,6 @@ import {
   getGlossary,
   reviewGlossaryEntry,
   saveGlossaryEntry,
-  updateGlossaryConcept,
   updateGlossaryEntry
 } from '../api/localizationApi'
 import GlossaryDetails from '../components/glossary/GlossaryDetails'
@@ -15,6 +14,23 @@ import GlossaryToolbar from '../components/glossary/GlossaryToolbar'
 import { EMPTY_GLOSSARY_FORM } from '../components/glossary/glossaryUtils'
 import '../styles/ProjectEditorPage.css'
 import '../styles/Glossary.css'
+
+const GLOSSARY_STATUS_PRIORITY = { PENDING: 3, APPROVED: 2, ARCHIVED: 1 }
+
+function pickConceptEntries(items) {
+  const byConcept = new Map()
+  items.forEach((entry) => {
+    const current = byConcept.get(entry.conceptId)
+    if (
+      !current ||
+      GLOSSARY_STATUS_PRIORITY[entry.status] > GLOSSARY_STATUS_PRIORITY[current.status] ||
+      (entry.status === current.status && entry.id > current.id)
+    ) {
+      byConcept.set(entry.conceptId, entry)
+    }
+  })
+  return [...byConcept.values()]
+}
 
 export default function GlossaryPage({
   activeLocaleCode,
@@ -30,7 +46,6 @@ export default function GlossaryPage({
   const [filter, setFilter] = useState('ACTIVE')
   const [selectedId, setSelectedId] = useState(null)
   const [form, setForm] = useState(null)
-  const [definitionDraft, setDefinitionDraft] = useState(null)
   const [decisionNote, setDecisionNote] = useState('')
   const [confirmArchive, setConfirmArchive] = useState(false)
   const [confirmDelete, setConfirmDelete] = useState(false)
@@ -84,14 +99,8 @@ export default function GlossaryPage({
   const selected = entries.find((entry) => entry.id === selectedId)
   const concepts = [...new Map(entries.map((entry) => [entry.conceptId, entry])).values()]
   const knownConcept =
-    form &&
-    concepts.find(
-      (entry) =>
-        entry.conceptId === form.conceptId ||
-        entry.concept.normalizedTerm ===
-          form.term.normalize('NFKC').toLowerCase().replace(/\s+/gu, ' ').trim()
-    )
-  const visible = entries
+    form && form.conceptId ? concepts.find((entry) => entry.conceptId === form.conceptId) : null
+  const filteredEntries = entries
     .filter(
       (entry) =>
         entry.locale.code === localeCode &&
@@ -101,6 +110,37 @@ export default function GlossaryPage({
         )
     )
     .sort((a, b) => a.term.localeCompare(b.term) || b.id - a.id)
+  const visible = [
+    ...new Map(
+      filteredEntries.map((entry) => {
+        const normalizedTerm = entry.concept.normalizedTerm
+        const group = filteredEntries.filter(
+          (candidate) => candidate.concept.normalizedTerm === normalizedTerm
+        )
+        const meanings = pickConceptEntries(group)
+        const representative =
+          group.find((candidate) => candidate.status === 'PENDING') ??
+          group.find((candidate) => candidate.status === 'APPROVED') ??
+          group[0]
+        return [
+          normalizedTerm,
+          {
+            ...representative,
+            entryIds: group.map((candidate) => candidate.id),
+            meaningCount: meanings.length,
+            additionalMeaningCount: Math.max(0, meanings.length - 1),
+            definition:
+              meanings.length > 1 ? `${meanings.length} значення` : representative.definition,
+            updatedAt: group.reduce(
+              (latest, candidate) =>
+                new Date(candidate.updatedAt) > new Date(latest) ? candidate.updatedAt : latest,
+              representative.updatedAt
+            )
+          }
+        ]
+      })
+    ).values()
+  ]
   const pageCount = Math.max(1, Math.ceil(visible.length / pageSize))
   const safePage = Math.min(currentPage, pageCount)
   const pageEntries = visible.slice((safePage - 1) * pageSize, safePage * pageSize)
@@ -173,21 +213,6 @@ export default function GlossaryPage({
     }
   }
 
-  async function saveDefinition() {
-    setBusy(true)
-    setError('')
-    try {
-      await updateGlossaryConcept(projectId, selected.conceptId, definitionDraft)
-      await refresh()
-      setDefinitionDraft(null)
-      setNotice('Визначення оновлено для всіх мов.')
-    } catch (requestError) {
-      setError(requestError.message)
-    } finally {
-      setBusy(false)
-    }
-  }
-
   function select(entry) {
     if (busy) return
     setForm(null)
@@ -195,7 +220,6 @@ export default function GlossaryPage({
     setDecisionNote('')
     setConfirmArchive(false)
     setConfirmDelete(false)
-    setDefinitionDraft(null)
     setError('')
   }
 
@@ -204,7 +228,6 @@ export default function GlossaryPage({
     setNotice('')
     setConfirmArchive(false)
     setConfirmDelete(false)
-    setDefinitionDraft(null)
   }
 
   function propose(entry) {
@@ -222,6 +245,17 @@ export default function GlossaryPage({
           }
         : { ...EMPTY_GLOSSARY_FORM, localeCode }
     )
+    resetPanelMessages()
+  }
+
+  function addMeaning(entry) {
+    setForm({
+      ...EMPTY_GLOSSARY_FORM,
+      conceptId: null,
+      fixedTerm: true,
+      term: entry.term,
+      localeCode
+    })
     resetPanelMessages()
   }
 
@@ -332,7 +366,7 @@ export default function GlossaryPage({
         </div>
         {panelOpen && (
           <aside className="glossary-panel" aria-label="Деталі терміна">
-            {!reviewer && selected && !form && (
+            {selected && !form && (
               <button
                 aria-label="Закрити деталі терміна"
                 className="glossary-panel-close"
@@ -362,20 +396,31 @@ export default function GlossaryPage({
                 confirmArchive={confirmArchive}
                 confirmDelete={confirmDelete}
                 decisionNote={decisionNote}
-                definitionDraft={definitionDraft}
-                entries={entries}
                 onArchive={() => setConfirmArchive(true)}
                 onDecide={decide}
                 onCancelArchive={() => setConfirmArchive(false)}
                 onCancelDelete={() => setConfirmDelete(false)}
                 onDecisionNoteChange={setDecisionNote}
-                onDefinitionDraftChange={setDefinitionDraft}
-                onDelete={confirmDelete ? remove : () => setConfirmDelete(true)}
-                onEdit={() => edit(selected)}
-                onSaveDefinition={saveDefinition}
+                onDelete={remove}
+                onAddMeaning={() => addMeaning(selected)}
+                onEdit={edit}
+                onRequestDelete={(entry) => {
+                  select(entry)
+                  setConfirmDelete(true)
+                }}
                 onSelect={select}
                 reviewer={reviewer}
                 selected={selected}
+                meanings={pickConceptEntries(
+                  entries.filter(
+                    (entry) =>
+                      entry.locale.code === localeCode &&
+                      entry.concept.normalizedTerm === selected.concept.normalizedTerm &&
+                      (filter === 'ARCHIVED'
+                        ? entry.status === 'ARCHIVED'
+                        : entry.status !== 'ARCHIVED')
+                  )
+                )}
               />
             ) : null}
           </aside>

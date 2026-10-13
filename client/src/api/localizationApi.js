@@ -166,7 +166,7 @@ export function deletePageVersion(projectId, versionId) {
   return request('/projects/' + projectId + '/versions/' + versionId, { method: 'DELETE' })
 }
 
-// Створює новий незмінний знімок сторінки з результату об’єднання двох версій.
+// Створює нову незалежну версію сторінки з результату об’єднання двох версій.
 export function mergePageVersions(projectId, merge) {
   return request('/projects/' + projectId + '/merge', {
     method: 'POST',

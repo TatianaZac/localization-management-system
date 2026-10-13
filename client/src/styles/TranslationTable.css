@@ -93,11 +93,19 @@
 .status {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   white-space: nowrap;
   padding: 4px 7px;
   border-radius: 99px;
-  font-size: 10px;
-  font-weight: 800;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 600;
+  letter-spacing: 0;
+  line-height: 16px;
+  text-rendering: geometricPrecision;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 .status.new {
   background: #f1f5f9;

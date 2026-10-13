@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import { formatGlossaryDate, GLOSSARY_STATUS_LABELS } from './glossaryUtils'
 
 function GlossaryDetails({
@@ -5,21 +6,40 @@ function GlossaryDetails({
   confirmArchive,
   confirmDelete,
   decisionNote,
-  definitionDraft,
-  entries,
   onArchive,
   onDecide,
   onCancelArchive,
   onCancelDelete,
   onDecisionNoteChange,
-  onDefinitionDraftChange,
   onDelete,
+  onAddMeaning,
   onEdit,
-  onSaveDefinition,
+  onRequestDelete,
   onSelect,
   reviewer,
-  selected
+  selected,
+  meanings
 }) {
+  const [expandedConcepts, setExpandedConcepts] = useState(() => new Set([selected.conceptId]))
+  const [openMenu, setOpenMenu] = useState(null)
+  const selectedMeaningNumber =
+    meanings.findIndex((entry) => entry.conceptId === selected.conceptId) + 1
+
+  useEffect(() => {
+    setExpandedConcepts((current) => new Set([...current, selected.conceptId]))
+  }, [selected.conceptId])
+
+  function toggleMeaning(entry) {
+    onSelect(entry)
+    setExpandedConcepts((current) => {
+      const next = new Set(current)
+      if (next.has(entry.conceptId)) next.delete(entry.conceptId)
+      else next.add(entry.conceptId)
+      return next
+    })
+    setOpenMenu(null)
+  }
+
   return (
     <div className="glossary-details">
       <div className="glossary-details-header">
@@ -28,79 +48,156 @@ function GlossaryDetails({
           {GLOSSARY_STATUS_LABELS[selected.status]}
         </span>
       </div>
-      <section className="glossary-detail-section">
-        <h3>Значення</h3>
-        <p className="glossary-value-box">{selected.definition || 'Не вказано'}</p>
-        {reviewer &&
-          (definitionDraft === null ? (
-            <button
-              className="glossary-definition-button"
-              disabled={busy}
-              onClick={() => onDefinitionDraftChange(selected.definition)}
+      <section className="glossary-detail-section glossary-meanings-section">
+        <div className="glossary-section-heading">
+          <h3>Значення терміна ({meanings.length})</h3>
+          <button className="glossary-add-meaning" disabled={busy} onClick={onAddMeaning}>
+            + Додати значення
+          </button>
+        </div>
+        <div className="glossary-meaning-list">
+          {meanings.map((entry, index) => (
+            <article
+              className={
+                'glossary-meaning-card' +
+                (entry.conceptId === selected.conceptId ? ' selected' : '')
+              }
+              key={entry.conceptId}
             >
-              ✎ Уточнити визначення
-            </button>
-          ) : (
-            <>
-              <label>
-                Визначення для всіх мов
-                <textarea
-                  maxLength={2000}
-                  value={definitionDraft}
-                  disabled={busy}
-                  onChange={(event) => onDefinitionDraftChange(event.target.value)}
-                />
-              </label>
-              <div className="glossary-buttons">
-                <button disabled={busy} onClick={onSaveDefinition}>
-                  Зберегти визначення
-                </button>
-                <button disabled={busy} onClick={() => onDefinitionDraftChange(null)}>
-                  Скасувати
-                </button>
+              <div
+                className="glossary-meaning-heading"
+                onClick={() => toggleMeaning(entry)}
+                onKeyDown={(event) => {
+                  if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault()
+                    toggleMeaning(entry)
+                  }
+                }}
+                role="button"
+                tabIndex={busy ? -1 : 0}
+              >
+                <span className="glossary-meaning-number">{index + 1}</span>
+                <strong className="glossary-meaning-title">{entry.translation}</strong>
+                <span className={'glossary-status ' + entry.status.toLowerCase()}>
+                  {GLOSSARY_STATUS_LABELS[entry.status]}
+                </span>
+                <span className="glossary-meaning-actions">
+                  {reviewer && (
+                    <span className="glossary-meaning-menu">
+                      <button
+                        aria-expanded={openMenu === entry.conceptId}
+                        aria-label={`Дії для значення ${index + 1}`}
+                        disabled={busy}
+                        onClick={(event) => {
+                          event.stopPropagation()
+                          onSelect(entry)
+                          setOpenMenu((current) =>
+                            current === entry.conceptId ? null : entry.conceptId
+                          )
+                        }}
+                        type="button"
+                      >
+                        ⋮
+                      </button>
+                      {openMenu === entry.conceptId && (
+                        <span className="glossary-meaning-menu-popover" role="menu">
+                          <button
+                            onClick={(event) => {
+                              event.stopPropagation()
+                              setOpenMenu(null)
+                              onEdit(entry)
+                            }}
+                            role="menuitem"
+                            type="button"
+                          >
+                            Редагувати
+                          </button>
+                          <button
+                            className="delete"
+                            onClick={(event) => {
+                              event.stopPropagation()
+                              setOpenMenu(null)
+                              onRequestDelete(entry)
+                            }}
+                            role="menuitem"
+                            type="button"
+                          >
+                            Видалити
+                          </button>
+                        </span>
+                      )}
+                    </span>
+                  )}
+                  <button
+                    aria-label={
+                      expandedConcepts.has(entry.conceptId)
+                        ? `Згорнути значення ${index + 1}`
+                        : `Розгорнути значення ${index + 1}`
+                    }
+                    className="glossary-meaning-toggle"
+                    disabled={busy}
+                    onClick={(event) => {
+                      event.stopPropagation()
+                      toggleMeaning(entry)
+                    }}
+                    type="button"
+                  >
+                    {expandedConcepts.has(entry.conceptId) ? '⌃' : '⌄'}
+                  </button>
+                </span>
               </div>
-            </>
+              {expandedConcepts.has(entry.conceptId) && (
+                <dl className="glossary-meaning-fields">
+                  <div>
+                    <dt>Переклад ({entry.locale.code.toUpperCase()})</dt>
+                    <dd>
+                      <strong>{entry.translation}</strong>
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>Визначення</dt>
+                    <dd>{entry.definition || 'Не вказано'}</dd>
+                  </div>
+                  {entry.example && (
+                    <div>
+                      <dt>Контекст</dt>
+                      <dd>{entry.example}</dd>
+                    </div>
+                  )}
+                  {entry.note && (
+                    <div>
+                      <dt>Примітка</dt>
+                      <dd>{entry.note}</dd>
+                    </div>
+                  )}
+                  <div className="glossary-meaning-metadata">
+                    <dt>Метадані</dt>
+                    <dd>
+                      <span>
+                        Запропонував/-ла:{' '}
+                        <strong>{entry.authorName ?? 'Автор невідомий (старий запис)'}</strong>
+                      </span>
+                      <span>
+                        Створено: <strong>{formatGlossaryDate(entry.createdAt)}</strong>
+                      </span>
+                      {entry.reviewerName && (
+                        <span>
+                          Рішення: <strong>{entry.reviewerName}</strong> ·{' '}
+                          {formatGlossaryDate(entry.reviewedAt)}
+                        </span>
+                      )}
+                      {entry.decisionNote && <span>Коментар: {entry.decisionNote}</span>}
+                    </dd>
+                  </div>
+                </dl>
+              )}
+            </article>
           ))}
-      </section>
-      <section className="glossary-detail-section glossary-translation-section">
-        <h3>◎ {selected.locale.name}</h3>
-        <p className="glossary-value-box">
-          <strong>{selected.translation}</strong>
-        </p>
-        {selected.example && (
-          <>
-            <h3>Приклад</h3>
-            <p>{selected.example}</p>
-          </>
-        )}
-        {selected.note && (
-          <>
-            <h3>Примітка</h3>
-            <p>{selected.note}</p>
-          </>
-        )}
-        <dl className="glossary-metadata">
-          <div>
-            <dt>Запропонував/-ла</dt>
-            <dd>{selected.authorName ?? 'Автор невідомий (старий запис)'}</dd>
-          </div>
-          <div>
-            <dt>Створено</dt>
-            <dd>{formatGlossaryDate(selected.createdAt)}</dd>
-          </div>
-          {selected.reviewerName && (
-            <div>
-              <dt>Рішення рецензента</dt>
-              <dd>
-                {selected.reviewerName} · {formatGlossaryDate(selected.reviewedAt)}
-              </dd>
-            </div>
-          )}
-        </dl>
-        {selected.decisionNote && <p>{selected.decisionNote}</p>}
+        </div>
       </section>
       {reviewer && (
         <section className="glossary-detail-section glossary-review">
+          <h3>Рішення для значення {selectedMeaningNumber}</h3>
           {selected.status !== 'ARCHIVED' && (
             <label>
               Коментар до рішення
@@ -126,12 +223,6 @@ function GlossaryDetails({
                 <span>◷</span>До архіву
               </button>
             )}
-            <button className="edit" disabled={busy} onClick={onEdit}>
-              <span>✎</span>Редагувати
-            </button>
-            <button className="delete" disabled={busy} onClick={onDelete}>
-              <span>×</span>Видалити
-            </button>
           </div>
           {confirmArchive && (
             <div className="glossary-confirm">
@@ -157,21 +248,6 @@ function GlossaryDetails({
           )}
         </section>
       )}
-      <section className="glossary-detail-section glossary-history-section">
-        <h3>Варіанти та історія поняття</h3>
-        <ul className="glossary-variants">
-          {entries
-            .filter((entry) => entry.conceptId === selected.conceptId)
-            .map((entry) => (
-              <li key={entry.id}>
-                <button disabled={busy} onClick={() => onSelect(entry)}>
-                  {entry.locale.code}: {entry.translation} · {GLOSSARY_STATUS_LABELS[entry.status]}{' '}
-                  <span>›</span>
-                </button>
-              </li>
-            ))}
-        </ul>
-      </section>
     </div>
   )
 }

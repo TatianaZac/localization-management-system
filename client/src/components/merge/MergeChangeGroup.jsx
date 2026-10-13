@@ -1,9 +1,18 @@
-import { AlertTriangle, ChevronDown, CircleMinus, CirclePlus, Equal, Pencil } from 'lucide-react'
+import {
+  AlertTriangle,
+  BookOpenCheck,
+  ChevronDown,
+  CircleMinus,
+  CirclePlus,
+  Equal,
+  Pencil
+} from 'lucide-react'
 import MergeChangeCard from './MergeChangeCard'
 import MergePresenceTable from './MergePresenceTable'
 
 const ICONS = {
   all: Equal,
+  terminology: BookOpenCheck,
   translation: AlertTriangle,
   source: Pencil,
   added: CirclePlus,
@@ -24,6 +33,7 @@ export default function MergeChangeGroup({
   const isPresenceGroup = groupType === 'added' || groupType === 'removed'
   const isCategoryGroup =
     isPresenceGroup ||
+    groupType === 'terminology' ||
     groupType === 'source' ||
     groupType === 'translation' ||
     groupType === 'unchanged'
@@ -31,6 +41,8 @@ export default function MergeChangeGroup({
   const addedChanges = changes.filter((change) => change.added)
   const removedChanges = changes.filter((change) => change.removed)
   const descriptionsByType = {
+    terminology:
+      'Перевірка враховує контекст кожного входження терміна та показує рекомендований відповідник.',
     translation: `Переклади у ${targetVersion} та ${incomingVersion} відрізняються. Вибери потрібний варіант.`,
     source: `Оригінал у ${targetVersion} та ${incomingVersion} відрізняється, тому переклад отримує статус OUTDATED.`,
     added: `Ключі є у ${incomingVersion}, але відсутні у ${targetVersion}, і будуть додані до результату.`,
