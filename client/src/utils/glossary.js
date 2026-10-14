@@ -174,3 +174,38 @@ export function rankGlossaryMatches(source, entries) {
       })
     })
 }
+
+// Сервер додає семантичну рекомендацію лише до тих збігів, які лишилися неоднозначними.
+export function applyTerminologyAnalysis(matches, analysis) {
+  if (!analysis?.matches?.length) return matches
+  const analyzedByKey = new Map(analysis.matches.map((match) => [match.key, match]))
+
+  return matches.map((match) => {
+    const analyzed = analyzedByKey.get(match.key)
+    if (!analyzed) return match
+    const scoresByEntryId = new Map(
+      analyzed.candidates.map((candidate) => [candidate.entryId, candidate])
+    )
+    const candidates = match.candidates
+      .map((candidate) => ({ ...candidate, ...scoresByEntryId.get(candidate.entry.id) }))
+      .sort((left, right) => {
+        const leftIndex = analyzed.candidates.findIndex(({ entryId }) => entryId === left.entry.id)
+        const rightIndex = analyzed.candidates.findIndex(
+          ({ entryId }) => entryId === right.entry.id
+        )
+        return leftIndex - rightIndex
+      })
+    const recommended = candidates.find(
+      ({ entry }) => entry.id === analyzed.recommendedEntryId
+    )?.entry
+
+    return {
+      ...match,
+      candidates,
+      recommended: recommended ?? null,
+      ambiguous: !recommended,
+      resolution: analyzed.resolution,
+      resolvedSemantically: analyzed.resolution === 'SEMANTIC'
+    }
+  })
+}

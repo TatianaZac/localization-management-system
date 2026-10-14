@@ -1,8 +1,13 @@
 // Права панель збирає всі дії та історію лише для вибраного рядка перекладу.
 
 import { useEffect, useState } from 'react'
+import { analyzeGlossaryContexts } from '../../api/localizationApi'
 import GlossaryProposal from '../projects/GlossaryProposal'
-import { matchesGlossaryTerm, rankGlossaryMatches } from '../../utils/glossary'
+import {
+  applyTerminologyAnalysis,
+  matchesGlossaryTerm,
+  rankGlossaryMatches
+} from '../../utils/glossary'
 import {
   BookOpen,
   Check,
@@ -90,10 +95,49 @@ export default function KeyDetailsPanel({
   const versions = selectedTranslation?.versions ?? []
   const [reviewVersionNumber, setReviewVersionNumber] = useState(null)
   const [isGlossaryOpen, setIsGlossaryOpen] = useState(true)
+  const [terminologyAnalysis, setTerminologyAnalysis] = useState(null)
+  const [isAnalyzingTerminology, setIsAnalyzingTerminology] = useState(false)
+  const sourceText =
+    selectedKey?.sourceTexts?.find((sourceText) => sourceText.isCurrent)?.value ??
+    selectedKey?.sourceTexts[0]?.value ??
+    ''
+  const baseGlossaryMatches = rankGlossaryMatches(
+    sourceText,
+    glossary.filter((entry) => entry.locale.code === selectedLocaleCode)
+  )
 
   useEffect(() => {
     setReviewVersionNumber(selectedTranslation?.currentVersion ?? versions[0]?.number ?? null)
   }, [selectedTranslation?.id, selectedTranslation?.currentVersion, versions[0]?.number])
+
+  useEffect(() => {
+    let active = true
+    setTerminologyAnalysis(null)
+    if (
+      !sourceText ||
+      !selectedLocaleCode ||
+      !baseGlossaryMatches.some((match) => !match.recommended)
+    ) {
+      setIsAnalyzingTerminology(false)
+      return undefined
+    }
+
+    setIsAnalyzingTerminology(true)
+    analyzeGlossaryContexts(projectId, selectedLocaleCode, [{ id: 'selected', text: sourceText }])
+      .then((result) => {
+        if (active) setTerminologyAnalysis(result.items[0] ?? null)
+      })
+      .catch(() => {
+        if (active) setTerminologyAnalysis(null)
+      })
+      .finally(() => {
+        if (active) setIsAnalyzingTerminology(false)
+      })
+
+    return () => {
+      active = false
+    }
+  }, [glossary, projectId, selectedLocaleCode, selectedKey?.id, sourceText])
 
   if (!selectedKey) {
     return (
@@ -103,24 +147,23 @@ export default function KeyDetailsPanel({
     )
   }
 
-  const glossaryMatches = rankGlossaryMatches(
-    selectedKey.sourceTexts[0]?.value,
-    glossary.filter((entry) => entry.locale.code === selectedLocaleCode)
-  ).map((match) => {
-    if (match.recommended) return match
+  const glossaryMatches = applyTerminologyAnalysis(baseGlossaryMatches, terminologyAnalysis).map(
+    (match) => {
+      if (match.recommended) return match
 
-    const usedCandidates = match.candidates.filter(({ entry }) =>
-      matchesGlossaryTerm(selectedTranslation?.value, entry.translation)
-    )
-    const used = usedCandidates.length === 1 ? usedCandidates[0].entry : null
+      const usedCandidates = match.candidates.filter(({ entry }) =>
+        matchesGlossaryTerm(selectedTranslation?.value, entry.translation)
+      )
+      const used = usedCandidates.length === 1 ? usedCandidates[0].entry : null
 
-    return {
-      ...match,
-      ambiguous: !used,
-      recommended: used,
-      resolvedFromTranslation: Boolean(used)
+      return {
+        ...match,
+        ambiguous: !used,
+        recommended: used,
+        resolvedFromTranslation: Boolean(used)
+      }
     }
-  })
+  )
   const reviewVersion = versions.find((version) => version.number === reviewVersionNumber)
   const currentSourceVersion = selectedKey.sourceTexts[0]?.version
   const reviewVersionIsOutdated =
@@ -234,8 +277,14 @@ export default function KeyDetailsPanel({
                       <p className="glossary-ambiguity-note">
                         <Info aria-hidden="true" size={16} />
                         <span>
-                          <strong>Неоднозначний термін:</strong> недостатньо контексту для однієї
-                          рекомендації.
+                          <strong>
+                            {isAnalyzingTerminology
+                              ? 'Аналізуємо контекст:'
+                              : 'Неоднозначний термін:'}
+                          </strong>{' '}
+                          {isAnalyzingTerminology
+                            ? 'порівнюємо зміст із прикладами глосарія.'
+                            : 'недостатньо контексту для однієї рекомендації.'}
                         </span>
                       </p>
                     )}
@@ -245,7 +294,9 @@ export default function KeyDetailsPanel({
                         const label = isRecommended
                           ? match.resolvedFromTranslation
                             ? 'Використано в перекладі'
-                            : 'Рекомендовано'
+                            : match.resolvedSemantically
+                              ? 'Рекомендовано за змістом'
+                              : 'Рекомендовано'
                           : 'Можливе значення'
 
                         return (

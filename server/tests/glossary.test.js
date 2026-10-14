@@ -310,9 +310,11 @@ test('цикл глосарію, права, інші мови та межі п�
 })
 
 test('зіставлення термінів враховує регістр, Unicode і межі слів', async () => {
-  const { matchesGlossaryTerm: matches, rankGlossaryMatches } = await import(
-    '../../client/src/utils/glossary.js'
-  )
+  const {
+    applyTerminologyAnalysis,
+    matchesGlossaryTerm: matches,
+    rankGlossaryMatches
+  } = await import('../../client/src/utils/glossary.js')
   assert.equal(matches('Please SIGN IN now.', 'Sign in'), true)
   assert.equal(matches('category', 'cat'), false)
   assert.equal(matches('Увійти зараз', 'увійти'), true)
@@ -344,6 +346,23 @@ test('зіставлення термінів враховує регістр, U
   const ambiguous = rankGlossaryMatches('Check the order', entries)
   assert.equal(ambiguous[0].recommended, null)
   assert.equal(ambiguous[0].ambiguous, true)
+
+  const resolvedByMeaning = applyTerminologyAnalysis(ambiguous, {
+    matches: [
+      {
+        key: ambiguous[0].key,
+        recommendedEntryId: 1,
+        resolution: 'SEMANTIC',
+        candidates: [
+          { entryId: 1, lexicalScore: 0, semanticScore: 0.51 },
+          { entryId: 2, lexicalScore: 0, semanticScore: 0.33 }
+        ]
+      }
+    ]
+  })
+  assert.equal(resolvedByMeaning[0].recommended.translation, 'замовлення')
+  assert.equal(resolvedByMeaning[0].resolvedSemantically, true)
+  assert.equal(resolvedByMeaning[0].ambiguous, false)
 
   const repeated = rankGlossaryMatches('Order the items in the order shown', [
     {

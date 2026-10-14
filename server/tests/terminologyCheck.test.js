@@ -30,17 +30,7 @@ test('перевірка повертає рекомендацію лише за
   ])
   assert.deepEqual(await checkTerminology(db, 1, 2, 'Your account', 'Ваш обліковий запис'), [])
   assert.deepEqual(await checkTerminology(db, 1, 2, 'Your profile', 'Ваш профіль'), [])
-  assert.deepEqual(
-    await checkTerminology(
-      db,
-      1,
-      2,
-      'Add a new address',
-      'Додати нову адресу',
-      'account.addresses.add'
-    ),
-    []
-  )
+  assert.deepEqual(await checkTerminology(db, 1, 2, 'Add a new address', 'Додати нову адресу'), [])
 })
 
 test('контекст обирає значення лише за достатнього відриву', async () => {

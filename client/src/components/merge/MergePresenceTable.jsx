@@ -41,32 +41,34 @@ export default function MergePresenceTable({ changes, incomingVersion, targetVer
             </div>
             <div className="merge-presence-status" data-label="Статус / Примітка" role="cell">
               <StatusBadge status={status} />
-              {terminology?.warnings.length > 0 && (
-                <span className="merge-presence-terminology conflict">
-                  <AlertTriangle size={17} />
-                  Не відповідає глосарію
-                </span>
-              )}
-              {terminology?.compliant && (
-                <span className="merge-presence-terminology compliant">
-                  <CheckCircle2 size={17} />
-                  Відповідає глосарію
-                </span>
-              )}
-              {terminology?.hasTerms &&
-                !terminology.compliant &&
-                terminology.warnings.length === 0 && (
-                  <span className="merge-presence-terminology ambiguous">
-                    <HelpCircle size={17} />
-                    Контекст неоднозначний
+              <div className="merge-presence-notes">
+                {terminology?.warnings.length > 0 && (
+                  <span className="merge-presence-terminology conflict">
+                    <AlertTriangle size={17} />
+                    Не відповідає глосарію
                   </span>
                 )}
-              {isAdded && (
-                <span>
-                  <CheckCircle2 size={17} />
-                  Додані до {incomingVersion}
-                </span>
-              )}
+                {terminology?.compliant && (
+                  <span className="merge-presence-terminology compliant">
+                    <CheckCircle2 size={17} />
+                    Відповідає глосарію
+                  </span>
+                )}
+                {terminology?.hasTerms &&
+                  !terminology.compliant &&
+                  terminology.warnings.length === 0 && (
+                    <span className="merge-presence-terminology ambiguous">
+                      <HelpCircle size={17} />
+                      Контекст неоднозначний
+                    </span>
+                  )}
+                {isAdded && (
+                  <span>
+                    <CheckCircle2 size={17} />
+                    Додано до {incomingVersion}
+                  </span>
+                )}
+              </div>
               <button aria-label={`Інші дії для ${change.key}`} type="button">
                 <EllipsisVertical size={22} />
               </button>

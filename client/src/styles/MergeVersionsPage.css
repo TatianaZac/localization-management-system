@@ -605,7 +605,7 @@
   display: grid !important;
   grid-template-columns: 94px minmax(0, 1fr) auto;
   align-items: center;
-  gap: 16px;
+  gap: 12px;
 }
 .merge-presence-status mark {
   justify-self: start;
@@ -622,26 +622,34 @@
   background: #dcf7e7;
   color: #087a42;
 }
-.merge-presence-status > span {
+.merge-presence-notes {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+}
+.merge-presence-notes > span {
   display: inline-flex;
   align-items: center;
   gap: 8px;
   color: #667085;
-  white-space: nowrap;
+  line-height: 1.25;
   font-size: 12px;
 }
-.merge-presence-status > span svg {
+.merge-presence-notes > span svg {
+  flex: 0 0 auto;
   fill: #172033;
   color: #172033;
   stroke: #fff;
 }
-.merge-presence-status > span.merge-presence-terminology.conflict {
+.merge-presence-notes > span.merge-presence-terminology.conflict {
   color: #9b321b;
 }
-.merge-presence-status > span.merge-presence-terminology.compliant {
+.merge-presence-notes > span.merge-presence-terminology.compliant {
   color: #17633c;
 }
-.merge-presence-status > span.merge-presence-terminology.ambiguous {
+.merge-presence-notes > span.merge-presence-terminology.ambiguous {
   color: #76540d;
 }
 .merge-presence-status button {

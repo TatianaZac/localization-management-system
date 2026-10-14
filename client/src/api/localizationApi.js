@@ -194,6 +194,27 @@ export function getGlossary(projectId) {
   return request('/projects/' + projectId + '/glossary')
 }
 
+// Семантичний аналіз виконується локально на сервері лише для неоднозначних значень.
+export function analyzeGlossaryContexts(projectId, localeCode, sources) {
+  return sources
+    .reduce((batches, source, index) => {
+      if (index % 200 === 0) batches.push([])
+      batches.at(-1).push(source)
+      return batches
+    }, [])
+    .reduce(
+      async (resultPromise, batch) => {
+        const result = await resultPromise
+        const response = await request('/projects/' + projectId + '/terminology/analyze', {
+          method: 'POST',
+          body: JSON.stringify({ localeCode, sources: batch })
+        })
+        return { ...response, items: [...result.items, ...response.items] }
+      },
+      Promise.resolve({ items: [] })
+    )
+}
+
 // Зміна терміна також є новою пропозицією, яку має погодити рецензент.
 export function saveGlossaryEntry(projectId, entryId, entry) {
   return request('/projects/' + projectId + '/glossary', {

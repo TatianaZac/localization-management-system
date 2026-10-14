@@ -143,7 +143,8 @@ async function updateTranslation(req, res, next, db = prisma) {
       projectId,
       translation.localeId,
       currentSource?.value,
-      value
+      value,
+      { semantic: true }
     )
     const nextVersion = (translation.versions[0]?.number ?? 0) + 1
     const sourceVersion =

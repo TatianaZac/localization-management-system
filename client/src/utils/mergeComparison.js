@@ -1,4 +1,4 @@
-import { matchesGlossaryTerm, rankGlossaryMatches } from './glossary.js'
+import { applyTerminologyAnalysis, matchesGlossaryTerm, rankGlossaryMatches } from './glossary.js'
 
 function getTranslation(translationKey, localeCode) {
   return translationKey?.translations.find((translation) => translation.locale.code === localeCode)
@@ -20,10 +20,13 @@ function getCurrentSource(translationKey) {
   )
 }
 
-function analyzeTerminology(source, value, glossary, localeCode) {
-  const matches = rankGlossaryMatches(
-    source,
-    glossary.filter((entry) => entry.status === 'APPROVED' && entry.locale?.code === localeCode)
+function analyzeTerminology(source, value, glossary, localeCode, analysis) {
+  const matches = applyTerminologyAnalysis(
+    rankGlossaryMatches(
+      source,
+      glossary.filter((entry) => entry.status === 'APPROVED' && entry.locale?.code === localeCode)
+    ),
+    analysis
   )
   const warnings = matches
     .filter(
@@ -52,7 +55,13 @@ function analyzeTerminology(source, value, glossary, localeCode) {
   }
 }
 
-export function buildMergeComparison(targetProject, incomingProject, localeCode, glossary = []) {
+export function buildMergeComparison(
+  targetProject,
+  incomingProject,
+  localeCode,
+  glossary = [],
+  terminologyAnalyses = {}
+) {
   const targetKeys = new Map(
     (targetProject.translationKeys ?? []).map((translationKey) => [
       translationKey.key,
@@ -82,12 +91,19 @@ export function buildMergeComparison(targetProject, incomingProject, localeCode,
     const removed = Boolean(targetKey) && !incomingKey
     const sourceChanged = Boolean(targetKey && incomingKey && targetSource !== incomingSource)
     const translationChanged = Boolean(targetKey && incomingKey && targetValue !== incomingValue)
-    const targetTerminology = analyzeTerminology(targetSource, targetValue, glossary, localeCode)
+    const targetTerminology = analyzeTerminology(
+      targetSource,
+      targetValue,
+      glossary,
+      localeCode,
+      terminologyAnalyses[`target:${key}`]
+    )
     const incomingTerminology = analyzeTerminology(
       incomingSource,
       incomingValue,
       glossary,
-      localeCode
+      localeCode,
+      terminologyAnalyses[`incoming:${key}`]
     )
     const terminologyConflict = Boolean(
       targetTerminology.warnings.length || incomingTerminology.warnings.length

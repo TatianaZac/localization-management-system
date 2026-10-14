@@ -1,4 +1,4 @@
-// Детермінований пошук термінів і вибір значення за контекстом без ШІ.
+// Детермінований перший рівень: пошук термінів і оцінка явних контекстних збігів.
 const STOP_WORDS = new Set([
   'a',
   'an',
@@ -29,6 +29,7 @@ const STOP_WORDS = new Set([
   'with',
   'your'
 ])
+const { addSemanticRecommendations } = require('./semanticTerminology')
 
 function normalizeText(value) {
   return (value ?? '').normalize('NFKC').toLowerCase().replace(/\s+/gu, ' ').trim()
@@ -169,14 +170,20 @@ function rankEntries(source, entries) {
 }
 
 // Неоднозначний термін не створює хибного попередження.
-async function checkTerminology(db, projectId, localeId, source, value) {
+async function checkTerminology(db, projectId, localeId, source, value, options = {}) {
   if (!value) return []
   const entries = await db.glossaryEntry.findMany({
     where: { status: 'APPROVED', localeId, concept: { projectId } },
     include: { concept: true },
     orderBy: { id: 'asc' }
   })
-  const warnings = rankEntries(source, entries)
+  const lexicalMatches = rankEntries(source, entries)
+  const matches = options.semantic
+    ? (
+        await addSemanticRecommendations([{ id: 'translation', source, matches: lexicalMatches }])
+      )[0].matches
+    : lexicalMatches
+  const warnings = matches
     .filter(({ chosen }) => chosen && !containsTerm(value, chosen.translation))
     .map(({ term, chosen }) => ({
       term,

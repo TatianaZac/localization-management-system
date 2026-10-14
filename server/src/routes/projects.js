@@ -17,6 +17,7 @@ const {
 } = require('../controllers/translationsController')
 const { exportLocale } = require('../controllers/exportController')
 const { mergeVersions } = require('../controllers/mergeController')
+const { analyzeTerminologyContexts } = require('../controllers/terminologyController')
 const {
   getMembers,
   addMember,
@@ -44,6 +45,7 @@ router.get('/', getProjects)
 router.post('/', createProject)
 router.get('/:projectId', getProject)
 router.get('/:projectId/glossary', getGlossary)
+router.post('/:projectId/terminology/analyze', analyzeTerminologyContexts)
 router.post('/:projectId/glossary', saveGlossaryEntry)
 router.patch('/:projectId/glossary/:entryId/review', requireGlossaryReviewer, reviewGlossaryEntry)
 router.patch('/:projectId/glossary/:entryId', requireGlossaryReviewer, updateGlossaryEntry)

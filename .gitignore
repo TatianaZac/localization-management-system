@@ -3,9 +3,11 @@
 # Dependencies and local secrets
 **/node_modules/
 **/.env
+**/.cache/
 
 # IDE and AI-tool workspace files
 .idea/
+.tmp-edge-profile/
 **/.agents/
 **/.claude/
 **/.windsurf/

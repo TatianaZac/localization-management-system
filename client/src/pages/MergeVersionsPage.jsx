@@ -1,6 +1,11 @@
 import { ArrowLeft, GitMerge, Search } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { getGlossary, getProject, mergePageVersions } from '../api/localizationApi'
+import {
+  analyzeGlossaryContexts,
+  getGlossary,
+  getProject,
+  mergePageVersions
+} from '../api/localizationApi'
 import MergeChangeGroup from '../components/merge/MergeChangeGroup'
 import MergeFilters from '../components/merge/MergeFilters'
 import MergeVersionPicker from '../components/merge/MergeVersionPicker'
@@ -113,11 +118,38 @@ export default function MergeVersionsPage({
         getGlossary(projectId)
       ])
       if (sequence !== comparisonSequence.current) return
+      const semanticSources = [
+        ...(targetProject.translationKeys ?? []).map((key) => ({
+          id: `target:${key.key}`,
+          text:
+            key.sourceTexts.find((sourceText) => sourceText.isCurrent)?.value ??
+            key.sourceTexts[0]?.value ??
+            ''
+        })),
+        ...(incomingProject.translationKeys ?? []).map((key) => ({
+          id: `incoming:${key.key}`,
+          text:
+            key.sourceTexts.find((sourceText) => sourceText.isCurrent)?.value ??
+            key.sourceTexts[0]?.value ??
+            ''
+        }))
+      ].filter(({ text }) => text)
+      let terminologyAnalyses = {}
+      if (semanticSources.length) {
+        try {
+          const analyzed = await analyzeGlossaryContexts(projectId, locale.code, semanticSources)
+          terminologyAnalyses = Object.fromEntries(analyzed.items.map((item) => [item.id, item]))
+        } catch {
+          // Порівняння залишається доступним із детермінованим аналізом без моделі.
+        }
+      }
+      if (sequence !== comparisonSequence.current) return
       const nextComparison = buildMergeComparison(
         targetProject,
         incomingProject,
         locale.code,
-        glossary
+        glossary,
+        terminologyAnalyses
       )
       setComparison(nextComparison)
       setDecisions(defaultDecisions(nextComparison))
