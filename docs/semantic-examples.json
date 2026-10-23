@@ -1,0 +1,85 @@
+{
+  "model": "Xenova/all-MiniLM-L6-v2",
+  "results": [
+    {
+      "source": "The bank approved a loan.",
+      "expectedEntryId": 1,
+      "chosenEntryId": 1,
+      "translation": "банк",
+      "resolution": "LEXICAL",
+      "matchesExpectation": true,
+      "candidates": [
+        {
+          "translation": "банк",
+          "lexicalScore": 8,
+          "semanticScore": null
+        },
+        {
+          "translation": "берег",
+          "lexicalScore": 0,
+          "semanticScore": null
+        }
+      ]
+    },
+    {
+      "source": "The bank provides mortgages and savings accounts.",
+      "expectedEntryId": 1,
+      "chosenEntryId": 1,
+      "translation": "банк",
+      "resolution": "SEMANTIC",
+      "matchesExpectation": true,
+      "candidates": [
+        {
+          "translation": "банк",
+          "lexicalScore": 0,
+          "semanticScore": 0.46466571187365135
+        },
+        {
+          "translation": "берег",
+          "lexicalScore": 0,
+          "semanticScore": 0.3057157976269596
+        }
+      ]
+    },
+    {
+      "source": "Wild flowers grow on the bank beside the stream.",
+      "expectedEntryId": 2,
+      "chosenEntryId": 2,
+      "translation": "берег",
+      "resolution": "SEMANTIC",
+      "matchesExpectation": true,
+      "candidates": [
+        {
+          "translation": "берег",
+          "lexicalScore": 0,
+          "semanticScore": 0.5017933518933406
+        },
+        {
+          "translation": "банк",
+          "lexicalScore": 0,
+          "semanticScore": 0.2787797747314129
+        }
+      ]
+    },
+    {
+      "source": "Check the bank.",
+      "expectedEntryId": null,
+      "chosenEntryId": 1,
+      "translation": "банк",
+      "resolution": "SEMANTIC",
+      "matchesExpectation": false,
+      "candidates": [
+        {
+          "translation": "банк",
+          "lexicalScore": 0,
+          "semanticScore": 0.4841292475416751
+        },
+        {
+          "translation": "берег",
+          "lexicalScore": 0,
+          "semanticScore": 0.27508746374078646
+        }
+      ]
+    }
+  ]
+}
